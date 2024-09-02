@@ -29,13 +29,10 @@ class Producto extends Paginacion{
         $conexion = new Conexion();
         $conn = $conexion->conectar();
 
-        // Asegurar que current_page es al menos 1
         $this->current_page = max(1, $this->current_page);
 
-        // Calcular el offset
         $offset = ($this->current_page - 1) * $this->page_size;
-
-        // Corregir la consulta SQL
+        
         $query = "SELECT p.idProducto, p.nombreProducto, p.codigoBarras, p.precio, p.stock, p.fechaVencimiento, p.imagen, m.nombreMarca, c.nombreCategoria 
                 FROM producto p 
                 JOIN marca m ON p.marca_idMarca = m.idMarca 
@@ -113,6 +110,75 @@ class Producto extends Paginacion{
         return $producto;
     }
 
+    public function buscarProductos($nombreProducto = '', $codigoBarra = '', $marca_idMarca = '', $categoriaProducto_idCategoriaProducto = '', $current_page = 1, $page_size = 10) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $offset = ($current_page - 1) * $page_size;
+    
+        $query = "SELECT p.idProducto, p.nombreProducto, p.codigoBarras, p.precio, p.stock, p.fechaVencimiento, p.imagen, m.nombreMarca, c.nombreCategoria 
+                  FROM producto p 
+                  JOIN marca m ON p.marca_idMarca = m.idMarca 
+                  JOIN categoriaProducto c ON p.categoriaProducto_idCategoriaProducto = c.idCategoriaProducto 
+                  WHERE 1=1";
+    
+        if ($nombreProducto !== '') {
+            $query .= " AND p.nombreProducto LIKE '%$nombreProducto%'";
+        }
+        if ($codigoBarra !== '') {
+            $query .= " AND p.codigoBarras LIKE '%$codigoBarra%'";
+        }
+        if ($marca_idMarca !== '') {
+            $query .= " AND p.marca_idMarca = $marca_idMarca";
+        }
+        if ($categoriaProducto_idCategoriaProducto !== '') {
+            $query .= " AND p.categoriaProducto_idCategoriaProducto = $categoriaProducto_idCategoriaProducto";
+        }
+    
+        $query .= " LIMIT $offset, $page_size";
+    
+        $result = $conn->query($query);
+        $productos = [];
+        while ($row = $result->fetch_assoc()) {
+            $productos[] = $row;
+        }
+    
+        $conexion->desconectar();
+        return $productos;
+    }
+    
+    public function contarProductos($nombreProducto = '', $codigoBarra = '', $marca_idMarca = '', $categoriaProducto_idCategoriaProducto = '') {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "SELECT COUNT(*) as total 
+                  FROM producto p 
+                  JOIN marca m ON p.marca_idMarca = m.idMarca 
+                  JOIN categoriaProducto c ON p.categoriaProducto_idCategoriaProducto = c.idCategoriaProducto 
+                  WHERE 1=1";
+    
+        if ($nombreProducto !== '') {
+            $query .= " AND p.nombreProducto LIKE '%$nombreProducto%'";
+        }
+        if ($codigoBarra !== '') {
+            $query .= " AND p.codigoBarras LIKE '%$codigoBarra%'";
+        }
+        if ($marca_idMarca !== '') {
+            $query .= " AND p.marca_idMarca = $marca_idMarca";
+        }
+        if ($categoriaProducto_idCategoriaProducto !== '') {
+            $query .= " AND p.categoriaProducto_idCategoriaProducto = $categoriaProducto_idCategoriaProducto";
+        }
+    
+        $result = $conn->query($query);
+        $row = $result->fetch_assoc();
+        $conexion->desconectar();
+        return $row['total'];
+    }
+    
+    
+    
+    
 
     /**
      * Get the value of idProducto

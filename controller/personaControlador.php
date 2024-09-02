@@ -5,7 +5,7 @@ require_once('model/personaContacto.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear'])) {
     $nombrePersona = $_POST['nombrePersona'];
-    $apellidoPersona = $_POST['apellidoPersona']; 
+    $apellidoPersona = $_POST['apellidoPersona'];
     $edadPersona = $_POST['edadPersona'];
     $tipoSexo_idTipoSexo = $_POST['tipoSexo_idTipoSexo'];
     $tipoDocumento_idTipoDocumento = $_POST['tipoDocumento_idTipoDocumento'];
@@ -35,14 +35,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear'])) {
 
             if ($personaContacto->crearPersonaContacto()) {
                 header('Location: ../view/gestionPerfil.php');
+                exit();
             } else {
                 header('Location: ../view/gestionPerfil.php?error=Error al crear el contacto de la persona');
+                exit();
             }
         } else {
             header('Location: ../view/gestionPerfil.php?error=Error al crear el documento de la persona');
+            exit();
         }
     } else {
         header('Location: ../view/gestionPerfil.php?error=Error al registrar la persona');
+        exit();
     }
 }
 ?>

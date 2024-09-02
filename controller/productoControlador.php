@@ -1,10 +1,10 @@
 <?php
-ini_set('display_errors',1);
-ini_set('display_startup_errors',1);
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 require_once('../model/producto.php');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear'])) {
+if (isset($_POST['crear'])) {
     $nombreProducto = $_POST['nombreProducto'];
     $codigoBarra = $_POST['codigoBarras'];
     $precio = $_POST['precio'];
@@ -34,12 +34,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['crear'])) {
     } else {
         header('Location: ../?page=crearProducto&error=Error al crear el producto');
     }
+    exit;
 }
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar'])) {
+if (isset($_POST['editar'])) {
     $idProducto = $_POST['idProducto'];
     $nombreProducto = $_POST['nombreProducto'];
-    $codigoBarra = $_POST['codigoBarra'];
+    $codigoBarra = $_POST['codigoBarras'];
     $precio = $_POST['precio'];
     $stock = $_POST['stock'];
     $fechaVencimiento = $_POST['fechaVencimiento'];
@@ -64,7 +65,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar'])) {
     $producto->setCategoriaProducto_idCategoriaProducto($categoriaProducto_idCategoriaProducto);
 
     $producto->actualizarProducto();
-    header('Location: ../?page=gestionProductos.php');
+    header('Location: ../?page=gestionProductos');
+    exit;
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['accion']) && $_GET['accion'] === 'eliminar') {
@@ -72,9 +74,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['accion']) && $_GET['acc
 
     $producto = new Producto();
     if ($producto->eliminarProducto($idProducto)) {
-        header('Location: ../?page=gestionProductos.php');
+        header('Location: ../?page=gestionProductos');
     } else {
-        header('Location: ../?page=gestionProductos.php?error=Error al eliminar el producto');
+        header('Location: ../?page=gestionProductos?error=Error al eliminar el producto');
     }
+    exit;
 }
 ?>
