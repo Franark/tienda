@@ -38,20 +38,15 @@ class Usuario{
         $conn = $conexion->conectar();
         $passwordHash = password_hash($this->nickname, PASSWORD_DEFAULT);
 
-        // Inicia una transacción
         $conn->begin_transaction();
 
         try {
-            // Inserta en la tabla usuario
             $queryUsuario = "INSERT INTO usuario (nickname, email, password, rolUsuario_idRolUsuario) VALUES ('$this->nickname', '$this->email', '$passwordHash', '$this->rolUsuario_idRolUsuario')";
             if ($conn->query($queryUsuario) === TRUE) {
-                // Obtiene el último ID insertado
                 $idUsuario = $conn->insert_id;
 
-                // Inserta en la tabla persona
                 $queryPersona = "INSERT INTO persona (nombrePersona, apellidoPersona, edadPersona, tipoSexo_idTipoSexo, usuario_idUsuario) VALUES ('$nombrePersona', '$apellidoPersona', '$edadPersona', '$tipoSexo_idTipoSexo', '$this->id')";
                 if ($conn->query($queryPersona) === TRUE) {
-                    // Confirma la transacción
                     $conn->commit();
                     $conexion->desconectar();
                     return true;
@@ -62,7 +57,6 @@ class Usuario{
                 throw new Exception("Error al insertar en la tabla usuario: " . $conn->error);
             }
         } catch (Exception $e) {
-            // Revierte la transacción en caso de error
             $conn->rollback();
             $conexion->desconectar();
             return false;
@@ -74,28 +68,21 @@ class Usuario{
         $conn = $conexion->conectar();
         $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
         
-        // Inserción en la tabla usuario
         $query = "INSERT INTO usuario (nickname, email, password, rolUsuario_idRolUsuario) VALUES ('$this->nickname', '$this->email', '$passwordHash', '$this->rolUsuario_idRolUsuario')";
         
         if ($conn->query($query) === TRUE) {
             $idUsuario = $conn->insert_id;
             
-            // Intentar la inserción en la tabla persona
             $queryPersona = "INSERT INTO persona (usuario_idUsuario) VALUES ('$idUsuario')";
             if ($conn->query($queryPersona) === TRUE) {
-                // Si ambas inserciones son exitosas, desconectar y retornar true
                 $conexion->desconectar();
                 return true;
             } else {
-                // Si falla la inserción en persona, registrar el error
                 echo "Error en la inserción de persona: " . $conn->error;
             }
         } else {
-            // Si falla la inserción en usuario, registrar el error
             echo "Error en la inserción de usuario: " . $conn->error;
         }
-        
-        // Si alguna inserción falla, desconectar y retornar false
         $conexion->desconectar();
         return false;
     }    

@@ -1,22 +1,29 @@
 <?php
 $page_size = 10;
-$current_page = 0;
-
-if (isset($_GET['current_page'])) {
-    $current_page = max(0, intval($_GET['current_page'])); // Asegurarse de que no sea negativo
-}
+$current_page = isset($_GET['current_page']) ? max(0, intval($_GET['current_page'])) : 1;
+$search_query = isset($_GET['search_query']) ? $_GET['search_query'] : '';
 
 require_once('model/producto.php');
 $producto = new Producto();
+$producto->page_size = $page_size;
 $producto->current_page = $current_page;
-$productos = $producto->listarProductos();
-$cantidadProductos = $producto->cantidadProductos();
-$total_pages = ceil($cantidadProductos / $page_size);
 
+if ($search_query) {
+    $productos = $producto->buscarProductos($search_query, '', '', '', $current_page, $page_size);
+    $cantidadProductos = $producto->contarProductos($search_query, '', '', '');
+} else {
+    $productos = $producto->listarProductos();
+    $cantidadProductos = $producto->cantidadProductos();
+}
+
+$total_pages = ceil($cantidadProductos / $page_size);
 ?>
 <header>
     <h1>Gestionar Productos</h1>
+    <input type="text" id="buscarProducto" placeholder="Buscar producto..." value="<?= htmlspecialchars($search_query) ?>">
+    <button id="searchButton">Buscar</button>
 </header>
+
 <main>
     <table>
         <thead>
@@ -58,17 +65,24 @@ $total_pages = ceil($cantidadProductos / $page_size);
     <nav class="pagination">
         <ul>
             <li>
-                <a href="?page=gestionProductos&current_page=<?= max(0, $current_page - 1) ?>" <?= $current_page <= 0 ? 'disabled' : '' ?>>Atrás</a>
+                <a href="?page=gestionProductos&current_page=<?= max(1, $current_page - 1) ?>&search_query=<?= urlencode($search_query) ?>" <?= $current_page <= 1 ? 'disabled' : '' ?>>Atrás</a>
             </li>
             <p>
-                Página <?= $current_page + 1 ?> de <?= $total_pages ?>
+                Página <?= $current_page ?> de <?= $total_pages ?>
             </p>
             <p>
-                Mostrando <?= $page_size * $current_page + 1 ?> a <?= min($page_size * ($current_page + 1), $cantidadProductos) ?> de <?= $cantidadProductos ?> productos.
+                Mostrando <?= $page_size * ($current_page - 1) + 1 ?> a <?= min($page_size * $current_page, $cantidadProductos) ?> de <?= $cantidadProductos ?> productos.
             </p>
             <li>
-                <a href="?page=gestionProductos&current_page=<?= min($current_page + 1, $total_pages - 1) ?>" <?= $current_page >= $total_pages - 1 ? 'disabled' : '' ?>>Siguiente</a>
+                <a href="?page=gestionProductos&current_page=<?= min($current_page + 1, $total_pages) ?>&search_query=<?= urlencode($search_query) ?>" <?= $current_page >= $total_pages ? 'disabled' : '' ?>>Siguiente</a>
             </li>
         </ul>
     </nav>
 </main>
+
+<script>
+document.getElementById('searchButton').addEventListener('click', function() {
+    var searchQuery = document.getElementById('buscarProducto').value;
+    window.location.href = '?page=gestionProductos&search_query=' + encodeURIComponent(searchQuery) + '&current_page=1';
+});
+</script>
