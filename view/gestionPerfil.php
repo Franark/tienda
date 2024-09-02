@@ -24,7 +24,7 @@
                 <?php
                 require_once('../model/tipoSexo.php');
                 $tipoSexoModel = new TipoSexo();
-                $tiposSexo = $tipoSexoModel->listarTiposSexo();
+                $tiposSexo = $tipoSexoModel->listarTipoSexo();
                 foreach ($tiposSexo as $sexo) {
                     echo "<option value='{$sexo['idTipoSexo']}'>{$sexo['nombreTipoSexo']}</option>";
                 }
@@ -54,7 +54,7 @@
                 <?php
                 require_once('../model/tipoContacto.php');
                 $tipoContactoModel = new TipoContacto();
-                $tiposContacto = $tipoContactoModel->listarTiposContacto();
+                $tiposContacto = $tipoContactoModel->listarTipoContacto();
                 foreach ($tiposContacto as $contacto) {
                     echo "<option value='{$contacto['idTipoContacto']}'>{$contacto['nombreTipoContacto']}</option>";
                 }

@@ -42,6 +42,7 @@ function loadPage($page) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Página de Inicio</title>
     <link rel="stylesheet" href="assets/css/index.css">
+    <script src="assets/javascript/jquery-3.7.1.min.js.js"></script>
 </head>
 <body>
 
