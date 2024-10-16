@@ -3,14 +3,14 @@
 </header>
 <main>
     <?php
-    require_once('../model/usuario.php');
-    require_once('../model/rolUsuario.php');
+    require_once('model/usuario.php');
+    require_once('model/rolUsuario.php');
     
     $id = $_GET['id'];
     $usuario = new Usuario();
     $u = $usuario->obtenerUsuarioPorId($id);
     ?>
-    <form action="../controller/actualizarUsuario.php" method="post">
+    <form action="controller/actualizarUsuario.php" method="post">
         <input type="hidden" name="id"  value="<?php echo $u['idUsuario']; ?>">
         <label for="nickname">Nickname:</label>
         <input type="text" id="nickname" name="nickname" value="<?php echo $u['nickname']; ?>" required>

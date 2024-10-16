@@ -1,10 +1,21 @@
 <?php
 require_once('../model/usuario.php');
 
-$id = $_GET['id'];
+$idUsuario = $_GET['id'];
+
+if (isset($_GET['id'])) {
+    $idUsuario = $_GET['id'];
+} else {
+    header('Location: ../?page=gestionUsuarios&error=ID no proporcionado');
+    exit;
+}
+
 
 $usuario = new Usuario();
-$usuario->setId($id);
-
-header('Location: ../view/gestionUsuarios.php');
+if ($usuario->eliminar($idUsuario)) {
+    header('Location: ../?page=gestionUsuarios');
+} else {
+    echo "Error al eliminar el usuario con ID $idUsuario";
+    exit;
+}
 ?>

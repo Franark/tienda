@@ -2,6 +2,27 @@
     <h1>Gestión de Categorías</h1>
 </header>
 <main>
+    <?php if (isset($_GET['error'])): ?>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '<?php echo htmlspecialchars($_GET['error']); ?>',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    <?php endif; ?>
+
+    <?php if (isset($_GET['success'])): ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: '<?php echo htmlspecialchars($_GET['success']); ?>',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    <?php endif; ?>
     <table>
         <thead>
             <tr>
@@ -21,9 +42,10 @@
                 echo "<tr>";
                 echo "<td>{$c['idCategoriaProducto']}</td>";
                 echo "<td>{$c['nombreCategoria']}</td>";
-                echo "<td>";
-                echo "<td><a href='?page=editarCategoria&idCategoriaProducto={$c['idCategoriaProducto']}'>Editar</a> | <a href='controller/categoriaControlador.php?accion=eliminar&idCategoriaProducto={$c['idCategoriaProducto']}' onclick='return confirm(\"¿Está seguro de eliminar esta categoria?\")'>Eliminar</a></td>";
-                echo "</td>";
+                echo "<td>
+                        <a href='?page=editarCategoria&idCategoriaProducto={$c['idCategoriaProducto']}'>Editar</a> | 
+                        <a href='#' onclick='confirmarEliminacion({$c['idCategoriaProducto']})'>Eliminar</a>
+                      </td>";
                 echo "</tr>";
             }
             ?>
@@ -32,3 +54,4 @@
     <br>
     <a class="boton" href="?page=crearCategoria">Crear Nueva Categoría</a>
 </main>
+<script src="assets/javascript/validaciones.js"></script>

@@ -51,10 +51,16 @@ class CategoriaProducto {
     public function eliminarCategoria($idCategoriaProducto) {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
-        $query = "DELETE FROM categoriaProducto WHERE idCategoriaProducto='$idCategoriaProducto'";
-        $conn->query($query);
+    
+        $query = "DELETE FROM categoriaProducto WHERE idCategoriaProducto = ?";
+        $insertar = $conn->prepare($query);
+    
+        $resultado = $insertar->execute([$idCategoriaProducto]);
+        
         $conexion->desconectar();
+        return $resultado;
     }
+    
 
     public function obtenerCategoriaPorId($id) {
         $conexion = new Conexion();

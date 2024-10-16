@@ -18,5 +18,5 @@ $usuario->setEmail($email);
 $usuario->setPassword($password);
 $usuario->setRolUsuarioIdRolUsuario($rolUsuario_idRolUsuario);
 
-header('Location: ../view/gestionUsuarios.php');
+header('Location: ../?page=gestionUsuarios');
 ?>

@@ -1,0 +1,10 @@
+{
+    "name": "francisco/tienda",
+    "autoload":{
+        "model\\":"model/"
+    },
+    "require": {
+        "ajaz/random-quotes-generator-php": "^1.0",
+        "phpmailer/phpmailer": "^6.9"
+    }
+}

@@ -5,7 +5,7 @@ require_once('paginacion.php');
 class Producto extends Paginacion{
     public $idProducto;
     public $nombreProducto;
-    public $codigoBarra;
+    public $codigoBarras;
     public $precio;
     public $stock;
     public $fechaVencimiento;
@@ -13,10 +13,10 @@ class Producto extends Paginacion{
     public $marca_idMarca;
     public $categoriaProducto_idCategoriaProducto;
 
-    public function __construct($idProducto = null, $nombreProducto = null, $codigoBarra = null, $precio = null, $stock = null, $fechaVencimiento = null, $imagen = null, $marca_idMarca = null, $categoriaProducto_idCategoriaProducto = null) {
+    public function __construct($idProducto = null, $nombreProducto = null, $codigoBarras = null, $precio = null, $stock = null, $fechaVencimiento = null, $imagen = null, $marca_idMarca = null, $categoriaProducto_idCategoriaProducto = null) {
         $this->idProducto = $idProducto;
         $this->nombreProducto = $nombreProducto;
-        $this->codigoBarra = $codigoBarra;
+        $this->codigoBarras = $codigoBarras;
         $this->precio = $precio;
         $this->stock = $stock;
         $this->fechaVencimiento = $fechaVencimiento;
@@ -50,8 +50,6 @@ class Producto extends Paginacion{
         return $productos;
     }
 
-
-
     public function cantidadProductos(){
         $conexion = new Conexion();
         $conn = $conexion->conectar();
@@ -66,7 +64,7 @@ class Producto extends Paginacion{
         $conexion = new Conexion();
         $conn = $conexion->conectar();
         $query = "INSERT INTO producto (nombreProducto, codigoBarras, precio, stock, fechaVencimiento, imagen, marca_idMarca, categoriaProducto_idCategoriaProducto) 
-                  VALUES ('$this->nombreProducto', '$this->codigoBarra', '$this->precio', '$this->stock', '$this->fechaVencimiento', '$this->imagen', '$this->marca_idMarca', '$this->categoriaProducto_idCategoriaProducto')";
+                  VALUES ('$this->nombreProducto', '$this->codigoBarras', '$this->precio', '$this->stock', '$this->fechaVencimiento', '$this->imagen', '$this->marca_idMarca', '$this->categoriaProducto_idCategoriaProducto')";
     
         if ($conn->query($query) === TRUE) {
             $conexion->desconectar();
@@ -82,7 +80,7 @@ class Producto extends Paginacion{
     public function actualizarProducto() {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
-        $query = "UPDATE producto SET nombreProducto='$this->nombreProducto', codigoBarras='$this->codigoBarra', precio='$this->precio', stock='$this->stock', fechaVencimiento='$this->fechaVencimiento', imagen='$this->imagen', marca_idMarca='$this->marca_idMarca', categoriaProducto_idCategoriaProducto='$this->categoriaProducto_idCategoriaProducto' 
+        $query = "UPDATE producto SET nombreProducto='$this->nombreProducto', codigoBarras='$this->codigoBarras', precio='$this->precio', stock='$this->stock', fechaVencimiento='$this->fechaVencimiento', imagen='$this->imagen', marca_idMarca='$this->marca_idMarca', categoriaProducto_idCategoriaProducto='$this->categoriaProducto_idCategoriaProducto' 
                   WHERE idProducto='$this->idProducto'";
         return $conexion->insertar($query);
     }
@@ -110,7 +108,7 @@ class Producto extends Paginacion{
         return $producto;
     }
 
-    public function buscarProductos($nombreProducto = '', $codigoBarra = '', $marca_idMarca = '', $categoriaProducto_idCategoriaProducto = '', $current_page = 1, $page_size = 10) {
+    public function buscarProductos($nombreProducto = '', $codigoBarras = '', $marca_idMarca = '', $categoriaProducto_idCategoriaProducto = '', $current_page = 1, $page_size = 10) {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
     
@@ -125,8 +123,8 @@ class Producto extends Paginacion{
         if ($nombreProducto !== '') {
             $query .= " AND p.nombreProducto LIKE '%$nombreProducto%'";
         }
-        if ($codigoBarra !== '') {
-            $query .= " AND p.codigoBarras LIKE '%$codigoBarra%'";
+        if ($codigoBarras !== '') {
+            $query .= " AND p.codigoBarras LIKE '%$codigoBarras%'";
         }
         if ($marca_idMarca !== '') {
             $query .= " AND p.marca_idMarca = $marca_idMarca";
@@ -134,6 +132,7 @@ class Producto extends Paginacion{
         if ($categoriaProducto_idCategoriaProducto !== '') {
             $query .= " AND p.categoriaProducto_idCategoriaProducto = $categoriaProducto_idCategoriaProducto";
         }
+        
     
         $query .= " LIMIT $offset, $page_size";
     
@@ -147,7 +146,7 @@ class Producto extends Paginacion{
         return $productos;
     }
     
-    public function contarProductos($nombreProducto = '', $codigoBarra = '', $marca_idMarca = '', $categoriaProducto_idCategoriaProducto = '') {
+    public function contarProductos($nombreProducto = '', $codigoBarras = '', $marca_idMarca = '', $categoriaProducto_idCategoriaProducto = '') {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
     
@@ -160,25 +159,153 @@ class Producto extends Paginacion{
         if ($nombreProducto !== '') {
             $query .= " AND p.nombreProducto LIKE '%$nombreProducto%'";
         }
-        if ($codigoBarra !== '') {
-            $query .= " AND p.codigoBarras LIKE '%$codigoBarra%'";
+        if ($codigoBarras !== '') {
+            $query .= " AND p.codigoBarras LIKE '%$codigoBarras%'";
         }
         if ($marca_idMarca !== '') {
             $query .= " AND p.marca_idMarca = $marca_idMarca";
         }
         if ($categoriaProducto_idCategoriaProducto !== '') {
             $query .= " AND p.categoriaProducto_idCategoriaProducto = $categoriaProducto_idCategoriaProducto";
-        }
+        }        
     
         $result = $conn->query($query);
         $row = $result->fetch_assoc();
         $conexion->desconectar();
         return $row['total'];
     }
+
+    public function actualizarPreciosParaTodos($porcentaje){
+        $conexion= new Conexion();
+        $conn=$conexion->conectar();
+        $query="UPDATE producto SET precio=precio*($porcentaje+1)";
+        return $conexion->insertar($query);
+    }
+
+    public function actualizarPreciosPorMarca($marca_id, $porcentaje) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "UPDATE producto SET precio=precio*($porcentaje+1) WHERE marca_idMarca=$marca_id";
+        return $conexion->insertar($query);
+    }
+
+    public function actualizarPreciosPorCategoria($categoria_id, $porcentaje) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "UPDATE producto SET precio=precio*($porcentaje+1) WHERE categoriaProducto_idCategoriaProducto=$categoria_id";
+        return $conexion->insertar($query);
+    }
+
+    public function actualizarStock($idProducto, $cantidad) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "SELECT stock FROM producto WHERE idProducto = '$idProducto'";
+        $result = $conn->query($query);
+        $producto = $result->fetch_assoc();
+        $stockActual = $producto['stock'];
+        $nuevoStock = $stockActual + $cantidad;
+        $query = "UPDATE producto SET stock = $nuevoStock WHERE idProducto = '$idProducto'";
+        $conn->query($query);
     
+        $conexion->desconectar();
+    }
+
+    public function existeCodigoBarras($codigoBarras) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "SELECT COUNT(*) as total FROM producto WHERE codigoBarras = '$codigoBarras'";
+        $result = $conn->query($query);
+        $row = $result->fetch_assoc();
+
+        return $row['total'] > 0;
+    }
+
+    public function existeNombreProducto($nombreProducto) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "SELECT COUNT(*) as total FROM producto WHERE nombreProducto = '$nombreProducto'";
+        $result = $conn->query($query);
+        $row = $result->fetch_assoc();
+
+        return $row['total'] > 0;
+    }
+
+    public function obtenerProductosSinStock() {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "SELECT * FROM producto WHERE stock <= 0";
+        $result = $conn->query($query);
     
+        $productosSinStock = [];
+        while ($row = $result->fetch_assoc()) {
+            $productosSinStock[] = $row;
+        }
     
-    
+        $conexion->desconectar();
+        return $productosSinStock;
+    }
+
+    public function productosPorVencer(){
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "SELECT nombreProducto, DATEDIFF(fechaVencimiento, NOW()) AS fechaVencimiento
+                  FROM producto
+                  WHERE fechaVencimiento BETWEEN NOW() AND DATE_ADD(NOW(), INTERVAL 5 DAY)
+                  ORDER BY fechaVencimiento";
+        $result = $conn->query($query);
+        $productosPorVencer = [];
+        while ($row = $result->fetch_assoc()) {
+            $productosPorVencer[] = $row;
+        }
+        $conexion->desconectar();
+        return $productosPorVencer;
+    }
+
+    public function productosVendidosPorMes(){
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query= "SELECT 
+                p.nombreProducto, 
+                SUM(op.cantidad) AS total_vendido, 
+                MONTH(o.fechaOrden) AS mes, 
+                YEAR(o.fechaOrden) AS año
+                FROM 
+                    ordenProducto op
+                JOIN 
+                    producto p ON op.producto_idProducto = p.idProducto
+                JOIN 
+                    orden o ON op.orden_idOrden = o.idOrden
+                GROUP BY 
+                    p.nombreProducto, mes, año
+                ORDER BY 
+                    año DESC, mes DESC, total_vendido DESC";
+        $result = $conn->query($query);
+        $productosVendidosPorMes = [];
+        while ($row = $result->fetch_assoc()) {
+            $productosVendidosPorMes[] = $row;
+        }
+        $conexion->desconectar();
+        return $productosVendidosPorMes;
+    }
+
+    public function stockProuductos(){
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query= "SELECT 
+                nombreProducto, 
+                stock
+                FROM 
+                    producto p
+                ORDER BY 
+                    stock DESC";
+        $result = $conn->query($query);
+        $stockProuductos = [];
+        while ($row = $result->fetch_assoc()) {
+            $stockProuductos[] = $row;
+        }
+        $conexion->desconectar();
+        return $stockProuductos;
+    }
 
     /**
      * Get the value of idProducto
@@ -225,7 +352,7 @@ class Producto extends Paginacion{
      */ 
     public function getCodigoBarra()
     {
-        return $this->codigoBarra;
+        return $this->codigoBarras;
     }
 
     /**
@@ -233,9 +360,9 @@ class Producto extends Paginacion{
      *
      * @return  self
      */ 
-    public function setCodigoBarra($codigoBarra)
+    public function setCodigoBarra($codigoBarras)
     {
-        $this->codigoBarra = $codigoBarra;
+        $this->codigoBarras = $codigoBarras;
 
         return $this;
     }
