@@ -35,13 +35,20 @@ class Barrio{
         return $barrios;
     }
 
-    public function eliminarBarrio($idBarrio){
-        $conexion=new Conexion();
-        $conn=$conexion->conectar();
-        $query="DELETE FROM barrio WHERE idBarrio='$idBarrio'";
-        $conn->query($query);
-        $conexion->desconectar();
-    }
+    public function eliminarBarrio($idBarrio) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "DELETE FROM barrio WHERE idBarrio='$idBarrio'";
+        
+        if ($conn->query($query) === TRUE) {
+            $conexion->desconectar();
+            return true;
+        } else {
+            error_log("Error al eliminar el barrio: " . $conn->error);
+            $conexion->desconectar();
+            return false;
+        }
+    }    
 
     public function obtenerBarrioPorId($idBarrio) {
         $conexion = new Conexion();
@@ -51,17 +58,18 @@ class Barrio{
         if ($result->num_rows > 0) {
             $fila = $result->fetch_assoc();
             $conexion->desconectar();
-            return new Barrio($fila['idBarrio'], $fila['nombreBarrio']);
+            return $fila;
         } else {
             $conexion->desconectar();
             return null;
         }
     }
+    
 
-    public function editarBarrio($idBarrio, $nombreBarrio) {
+    public function editarBarrio($idBarrio) {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
-        $query = "UPDATE barrio SET nombreBarrio='$nombreBarrio' WHERE idBarrio='$idBarrio'";
+        $query = "UPDATE barrio SET nombreBarrio='$this->nombreBarrio' WHERE idBarrio='$idBarrio'";
         $conn->query($query);
         $conexion->desconectar();
     }

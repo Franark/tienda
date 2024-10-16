@@ -1,0 +1,28 @@
+[33mcommit 80488bed0dea0bdd3c4468f8902acdc829c4ea44[m[33m ([m[1;31morigin/cambio[m[33m, [m[1;32mmain[m[33m, [m[1;32mcambios[m[33m)[m
+Author: Franark <oscarfranciscooscar1@gmail.com>
+Date:   Mon Sep 2 14:57:45 2024 -0300
+
+    Cambios
+
+assets/css/crear.css
+assets/css/crearUsuarios.css
+assets/css/editar.css
+assets/css/editarUsuario.css
+assets/css/gestion.css
+assets/css/gestionUsuarios.css
+assets/css/index.css
+assets/css/login.css
+assets/css/signup.css
+assets/javascript/jquery-3.7.1.min.js.js
+controller/cargarPermisos.php
+controller/perfilControlador.php
+controller/personaControlador.php
+controller/productoControlador.php
+model/producto.php
+model/rolPermiso.php
+model/usuario.php
+tienda.sql
+view/gestionPaginas.php
+view/gestionPerfil.php
+view/gestionProductos.php
+view/plantilla.php
