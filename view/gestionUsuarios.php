@@ -23,7 +23,7 @@
                 echo "<td>{$u['nickname']}</td>";
                 echo "<td>{$u['email']}</td>";
                 echo "<td>{$u['nombreRol']}</td>";
-                echo "<td><a href='?page=editarUsuario&id={$u['idUsuario']}'>Editar</a> | <a href='?page=eliminarUsuario.php&id={$u['idUsuario']}'>Eliminar</a></td>";
+                echo "<td><a href='?page=editarUsuario&id={$u['idUsuario']}'>Editar</a> | <a href='controller/eliminarUsuario.php?id={$u['idUsuario']}' onclick='return confirm(\"¿Está seguro de eliminar este usuario?\")'>Eliminar</a></td>";
                 echo "</tr>";
             }
             ?>

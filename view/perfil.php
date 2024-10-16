@@ -51,7 +51,7 @@
             $tipoDocumentos = $tipoDocumentoObj->listarTiposDocumento(); 
             
             foreach ($tipoDocumentos as $td) {
-                $selected = ($td['idTipoDocumento'] == $tipoDocumento) ? "selected" : "";
+                $selected = ($td['idTipoDocumento'] == $idTipoDocumento) ? "selected" : "";
                 echo "<option value='{$td['idTipoDocumento']}' {$selected}>{$td['nombreTipoDocumento']}</option>";
             }
             ?>
@@ -81,11 +81,38 @@
                 echo '<label for="contactoValor' . $index . '">Contacto:</label>';
                 echo '<input type="text" id="contactoValor' . $index . '" name="contactos[' . $index . '][valor]" value="' . $contacto['valor'] . '" required>';
                 echo '<button type="button" class="eliminarContacto" data-index="' . $index . '">Eliminar</button>';
+                echo '<br><br>';
                 echo '</div>';
             }
             ?>
         </div>
         <button type="button" id="agregarContacto">Agregar Contacto</button>
+        <br><br>
+        <label for="barrio">Barrio:</label>
+        <select name="barrio" id="barrio">
+            <?php
+            require_once('model/barrio.php');
+            $barrioObj = new Barrio();
+            $barrios = $barrioObj->listarBarrios();
+
+            foreach ($barrios as $b) {
+                $selected = ($b['idBarrio'] == $datosPersona[0]['barrio_idBarrio']) ? "selected" : "";
+                echo "<option value='{$b['idBarrio']}' {$selected}>{$b['nombreBarrio']}</option>";
+            }
+            ?>
+        </select>
+        <div id="domicilios">
+            <?php
+            require_once('model/domicilio.php');
+            $domicilioObj = new Domicilio();
+            $domicilios = $domicilioObj->listarAtributosDomicilio($idPersona);
+            foreach ($domicilios as $index => $domicilio) {
+                echo '<div class="domicilio">';
+                echo '<label for="domicilio' . $index . '">'. $domicilio['nombreAtributo']. ':</label>';
+                echo '<input type="text" id="nombreAtributo' . $index. '" name="domicilios['. $index. '][nombreAtributo]">';
+            }
+            ?>
+        </div>
         <br><br>
         <input type="submit" name="actualizar" value="Actualizar">
     </form>

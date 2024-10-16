@@ -1,7 +1,26 @@
 <header>
-    <h1>Gestión de Barrios</h1>
+    <h1>Gestión de AtributoDomicilios</h1>
 </header>
 <main>
+    <?php if (isset($_GET['error'])): ?>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '<?php echo htmlspecialchars($_GET['error']); ?>',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    <?php elseif (isset($_GET['success'])): ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: '<?php echo htmlspecialchars($_GET['success']); ?>',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    <?php endif; ?>
     <table>
         <thead>
             <tr>
@@ -12,20 +31,20 @@
         </thead>
         <tbody>
             <?php
-            require_once('model/barrio.php');
-            $barrio = new Barrio();
-            $barrios = $barrio->listarBarrios();
+            require_once('model/domicilio.php');
+            $barrio = new Domicilio();
+            $barrios = $barrio->listarAtributosDomicilio();
 
             foreach ($barrios as $b) {
                 echo "<tr>";
-                echo "<td>{$b['idBarrio']}</td>";
-                echo "<td>{$b['nombreBarrio']}</td>";
-                echo "<td><a href='?page=editarBarrio&idBarrio={$b['idBarrio']}'>Editar</a> | <a href='controller/barrioControlador.php?accion=eliminar&idBarrio={$b['idBarrio']}' onclick='return confirm(\"¿Está seguro de eliminar este tipo de documento?\")'>Eliminar</a></td>";
+                echo "<td>{$b['idAtributoDomicilio']}</td>";
+                echo "<td>{$b['nombreAtributoDomicilio']}</td>";
+                echo "<td><a href='?page=editarAtributoDomicilio&idAtributoDomicilio={$b['idAtributoDomicilio']}'>Editar</a> | <a href='controller/barrioControlador.php?accion=eliminar&idAtributoDomicilio={$b['idAtributoDomicilio']}'>Eliminar</a></td>";
                 echo "</tr>";
             }
             ?>
         </tbody>
     </table>
     <br>
-    <a class="boton" href="?page=crearBarrio">Crear Nueva Categoria</a>
+    <a class="boton" href="?page=crearAtributoDomicilio">Crear Nueva Categoria</a>
 </main>

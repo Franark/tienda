@@ -11,8 +11,10 @@ class Persona {
     private $valorDocumento;
     private $tipoDocumento;
     private $contactos;
+    private $domicilio;
+    private $domicilioDetalle;
 
-    public function __construct($idPersona=null ,$nombrePersona = null, $apellidoPersona = null, $edadPersona = null, $nombreBarrio = null, $tipoSexo_idTipoSexo=null, $valorDocumento=null, $tipoDocumento=null, $contactos=[]) {
+    public function __construct($idPersona=null ,$nombrePersona = null, $apellidoPersona = null, $edadPersona = null, $nombreBarrio = null, $tipoSexo_idTipoSexo=null, $valorDocumento=null, $tipoDocumento=null, $contactos=[], $domicilio=null, $domicilioDetalle=null) {
         $this->idPersona = $idPersona;
         $this->nombrePersona = $nombrePersona;
         $this->apellidoPersona = $apellidoPersona;
@@ -22,6 +24,8 @@ class Persona {
         $this->valorDocumento = $valorDocumento;
         $this->tipoDocumento = $tipoDocumento;
         $this->contactos = $contactos;
+        $this->domicilio = $domicilio;
+        $this->domicilioDetalle = $domicilioDetalle;
     }
 
     public function listarPersona($idUsuario) {
@@ -76,7 +80,8 @@ class Persona {
     public function actualizarPersona() {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
-
+    
+        // Actualizar los datos de la persona
         $query = "UPDATE persona 
                   SET nombrePersona = '$this->nombrePersona', 
                       apellidoPersona = '$this->apellidoPersona', 
@@ -89,38 +94,69 @@ class Persona {
             $queryCheck = "SELECT COUNT(*) as count FROM personaDocumento WHERE persona_idPersona = '$this->idPersona'";
             $resultCheck = $conn->query($queryCheck);
             $rowCheck = $resultCheck->fetch_assoc();
-
+    
             if ($rowCheck['count'] > 0) {
-                // Si el documento existe, actualizar
                 $queryDocumento = "UPDATE personaDocumento 
                                    SET valor = '$this->valorDocumento' 
                                    WHERE persona_idPersona = '$this->idPersona' AND tipoDocumento_idTipoDocumento='$this->tipoDocumento'";
             } else {
-                // Si el documento no existe, insertar
                 $queryDocumento = "INSERT INTO personaDocumento (valor ,persona_idPersona, tipoDocumento_idTipoDocumento) 
                                    VALUES ('$this->valorDocumento', '$this->idPersona', '$this->tipoDocumento')";
             }
-
+    
             $conn->query($queryDocumento);
-
-            // Actualizar contactos
+    
             $queryDeleteContactos = "DELETE FROM personaContacto WHERE persona_idPersona = '$this->idPersona'";
             $conn->query($queryDeleteContactos);
-
+    
             foreach ($this->contactos as $contacto) {
                 $queryInsertContacto = "INSERT INTO personaContacto (valor, persona_idPersona, tipoContacto_idTipoContacto) 
                                         VALUES ('{$contacto['valor']}', '$this->idPersona', '{$contacto['tipoContacto_idTipoContacto']}')";
                 $conn->query($queryInsertContacto);
             }
 
+            if (!empty($this->domicilio)) {
+                $queryCheckDomicilio = "SELECT COUNT(*) as count FROM domicilio WHERE persona_idPersona = '$this->idPersona'";
+                $resultCheckDomicilio = $conn->query($queryCheckDomicilio);
+                $rowCheckDomicilio = $resultCheckDomicilio->fetch_assoc();
+    
+                if ($rowCheckDomicilio['count'] > 0) {
+                    $queryDomicilio = "UPDATE domicilio 
+                                       SET nombreBarrio = '{$this->domicilio['nombreBarrio']}', 
+                                           calle = '{$this->domicilio['calle']}', 
+                                           numero = '{$this->domicilio['numero']}', 
+                                           tipoDomicilio = '{$this->domicilio['tipoDomicilio']}' 
+                                       WHERE persona_idPersona = '$this->idPersona'";
+                } else {
+                    $queryDomicilio = "INSERT INTO domicilio (nombreBarrio, calle, numero, tipoDomicilio, persona_idPersona) 
+                                       VALUES ('{$this->domicilio['nombreBarrio']}', '{$this->domicilio['calle']}', 
+                                               '{$this->domicilio['numero']}', '{$this->domicilio['tipoDomicilio']}', 
+                                               '$this->idPersona')";
+                }
+                $conn->query($queryDomicilio);
+            }
+    
+            if (!empty($this->domicilioDetalle)) {
+                $queryDeleteDomicilioDetalle = "DELETE FROM domicilio_detalle WHERE domicilio_idDomicilio = 
+                                                (SELECT idDomicilio FROM domicilio WHERE persona_idPersona = '$this->idPersona')";
+                $conn->query($queryDeleteDomicilioDetalle);
+    
+                foreach ($this->domicilioDetalle as $detalle) {
+                    $queryInsertDomicilioDetalle = "INSERT INTO domicilio_detalle (detalle, domicilio_idDomicilio) 
+                                                    VALUES ('{$detalle['detalle']}', 
+                                                            (SELECT idDomicilio FROM domicilio WHERE persona_idPersona = '$this->idPersona'))";
+                    $conn->query($queryInsertDomicilioDetalle);
+                }
+            }
+    
             $conexion->desconectar();
             return true;
-
+    
         } else {
             $conexion->desconectar();
             return false;
         }
-    }
+    }    
 
     /**
      * Get the value of nombreBarrio

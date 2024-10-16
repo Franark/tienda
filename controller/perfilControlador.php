@@ -22,32 +22,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar'])) {
     $persona->setTipoDocumento($tipoDocumento);
     $persona->setValorDocumento($valorDocumento);
 
-    $contactosArray = [];
-    foreach ($contactos as $contacto) {
-        $contactosArray[] = [
-            'tipoContacto_idTipoContacto' => $contacto['tipoContacto_idTipoContacto'],
-            'valor' => $contacto['valor']
-        ];
-    }
-    $persona->setContactos($contactosArray);
-
+    // Actualizar persona
     $persona->actualizarPersona();
 
-    header('Location: ../?page=perfil');
-    exit();
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminarContacto'])) {
-    $contactoId = $_POST['contactoId'];
-
-    $persona = new Persona();
-    $resultado = $persona->eliminarContacto($contactoId);
-
-    if ($resultado) {
-        header('Location: ../?page=perfil');
-    } else {
-        echo "Error al eliminar el contacto.";
+    // Actualizar contactos
+    if ($contactos) {
+        foreach ($contactos as $contacto) {
+            if (isset($contacto['id'])) {
+                // Actualizar contacto existente
+                $persona->actualizarContacto($contacto['id'], $contacto['tipoContacto_idTipoContacto'], $contacto['valor']);
+            } else {
+                // Agregar nuevo contacto
+                $persona->agregarContacto($idPersona, $contacto['tipoContacto_idTipoContacto'], $contacto['valor']);
+            }
+        }
     }
+
+    header('Location: ../perfil.php');
     exit();
 }
 ?>

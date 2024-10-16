@@ -29,7 +29,7 @@ class RolPermiso {
     
         $conexion->desconectar();
         return $permisos;
-    }    
+    } 
 
 
     public function agregarRolPermiso($rol_idRol, $permiso_idPermiso) {
@@ -57,30 +57,20 @@ class RolPermiso {
         $conexion->desconectar();
         return $result;
     }
-
     public function obtenerPermisosPorRol($idRolUsuario) {
-        if (empty($idRolUsuario)) {
-            return [];
-        }
-    
         $conexion = new Conexion();
         $conn = $conexion->conectar();
-        $query = "SELECT permiso_idPermiso 
-                  FROM rolPermisos 
-                  WHERE rolUsuario_idRolUsuario = $idRolUsuario";
-        
-        $resultado = $conn->query($query);
+        $query = "SELECT permiso_idPermiso FROM rolPermisos WHERE rolUsuario_idRolusuario = '$idRolUsuario'";
+        $result = $conn->query($query);
         $permisos = [];
-    
-        if ($resultado) {
-            while ($row = $resultado->fetch_assoc()) {
-                $permisos[] = $row['permiso_idPermiso'];
+        if ($result) {
+            while ($fila = $result->fetch_assoc()) {
+                $permisos[] = $fila;
             }
         }
-    
-        $conexion->desconectar();
         return $permisos;
     }
+
     
     /**
      * Get the value of idRolPermisos

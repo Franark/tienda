@@ -2,22 +2,38 @@
     <h1>Editar Barrio</h1>
 </header>
 <main>
-    <?php
+   <?php
     require_once('model/barrio.php');
 
     $idBarrio = $_GET['idBarrio'];
-    $tipoDocumento = new TipoDocumento();
-    $documento = $tipoDocumento->obtenerTipoDocumentoPorId($idBarrio);
+    $barrio = new Barrio();
+    $barrio = $barrio->obtenerBarrioPorId($idBarrio);
 
-    if ($documento) {
-        echo "<form action='controller/tipoDocumentoControlador.php' method='POST'>";
-        echo "<input type='hidden' name='idBarrio' value='{$documento['idBarrio']}'>";
-        echo "<label for='nombreTipoDocumento'>Nombre:</label>";
-        echo "<input type='text' id='nombreTipoDocumento' name='nombreTipoDocumento' value='{$documento['nombreTipoDocumento']}' required><br><br>";
-        echo "<button type='submit' name='actualizar'>Actualizar Tipo de Documento</button>";
-        echo "</form>";
-    } else {
-        echo "<p>Documento no encontrado.</p>";
-    }
-    ?>
+    if (isset($_GET['error'])): ?>
+        <script>
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: '<?php echo htmlspecialchars($_GET['error']); ?>',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    <?php elseif (isset($_GET['success'])): ?>
+        <script>
+            Swal.fire({
+                icon: 'success',
+                title: 'Éxito',
+                text: '<?php echo htmlspecialchars($_GET['success']); ?>',
+                confirmButtonText: 'OK'
+            });
+        </script>
+    <?php endif; ?>
+
+    <form id="editarBarrioForm" action="controller/barrioControlador.php" method="post">
+        <input type="hidden" name="idBarrio" value="<?php echo $barrio['idBarrio'];?>">
+        <label for="nombreBarrio">Nombre del Barrio:</label>
+        <input type="text" id="nombreBarrio" name="nombreBarrio" value="<?php echo htmlspecialchars($barrio['nombreBarrio']);?>">
+        <br>
+        <input type="submit" name="editar" value="Actualizar">
+    </form>
 </main>

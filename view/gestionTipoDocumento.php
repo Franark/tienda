@@ -28,4 +28,4 @@
     </table>
     <br>
     <a class="boton" href="?page=crearTipoDocumento">Crear Nueva Categoria</a>
-</main>
+</main> 

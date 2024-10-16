@@ -35,7 +35,7 @@ class Marca {
             $conexion->desconectar();
             return true;
         } else {
-            error_log("Error en la creación de categoría: " . $conn->error);
+            error_log("Error en la creación de marca: " . $conn->error);
             $conexion->desconectar();
             return false;
         }
@@ -45,16 +45,30 @@ class Marca {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
         $query = "UPDATE marca SET nombreMarca='$this->nombreMarca' WHERE idMarca='$this->idMarca'";
-        $conn->query($query);
-        $conexion->desconectar();
+        $resultado = $conn->query($query);
+        if ($resultado) {
+            $conexion->desconectar();
+            return true;
+        } else {
+            error_log("Error en la creación de marca: " . $conn->error);
+            $conexion->desconectar();
+            return false;
+        }
     }
 
     public function eliminarMarca($idMarca) {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
         $query = "DELETE FROM marca WHERE idMarca='$idMarca'";
-        $conn->query($query);
-        $conexion->desconectar();
+        $resultado = $conn->query($query);
+        if ($resultado) {
+            $conexion->desconectar();
+            return true;
+        } else {
+            error_log("Error en la creación de marca: " . $conn->error);
+            $conexion->desconectar();
+            return false;
+        }
     }
 
     public function obtenerMarcaPorId($id) {

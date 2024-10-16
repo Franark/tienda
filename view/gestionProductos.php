@@ -1,6 +1,6 @@
 <?php
 $page_size = 10;
-$current_page = isset($_GET['current_page']) ? max(0, intval($_GET['current_page'])) : 1;
+$current_page = isset($_GET['current_page']) ? max(1, intval($_GET['current_page'])) : 1;
 $search_query = isset($_GET['search_query']) ? $_GET['search_query'] : '';
 
 require_once('model/producto.php');
@@ -47,12 +47,12 @@ $total_pages = ceil($cantidadProductos / $page_size);
                 echo "<td>{$p['idProducto']}</td>";
                 echo "<td>{$p['nombreProducto']}</td>";
                 echo "<td>{$p['codigoBarras']}</td>";
-                echo "<td>{$p['precio']}</td>";
+                echo "<td>" . number_format($p['precio'], 2, '.', ',') . "</td>";
                 echo "<td>{$p['stock']}</td>";
                 echo "<td>{$p['fechaVencimiento']}</td>";
                 echo "<td>{$p['nombreMarca']}</td>";
                 echo "<td>{$p['nombreCategoria']}</td>";
-                echo "<td><img src='../{$p['imagen']}' alt='Imagen del producto' width='50'></td>";
+                echo "<td><img src='assets/{$p['imagen']}' alt='Imagen del producto' width='50'></td>";
                 echo "<td><a href='?page=editarProducto&idProducto={$p['idProducto']}'>Editar</a> | <a href='controller/productoControlador.php?accion=eliminar&idProducto={$p['idProducto']}' onclick='return confirm(\"¿Está seguro de eliminar este producto?\")'>Eliminar</a></td>";
                 echo "</tr>";
             }
@@ -61,6 +61,7 @@ $total_pages = ceil($cantidadProductos / $page_size);
     </table>
     <br><br>
     <a class="boton" href="?page=crearProducto">Crear Nuevo Producto</a>
+    <a class="boton" href="?page=actualizarPrecios">Actualizar los precios de los Productos</a>
     <br>
     <nav class="pagination">
         <ul>
@@ -79,10 +80,9 @@ $total_pages = ceil($cantidadProductos / $page_size);
         </ul>
     </nav>
 </main>
-
 <script>
-document.getElementById('searchButton').addEventListener('click', function() {
-    var searchQuery = document.getElementById('buscarProducto').value;
-    window.location.href = '?page=gestionProductos&search_query=' + encodeURIComponent(searchQuery) + '&current_page=1';
-});
+    document.getElementById('searchButton').addEventListener('click', function() {
+        var searchQuery = document.getElementById('buscarProducto').value;
+        window.location.href = '?page=gestionProductos&search_query=' + encodeURIComponent(searchQuery) + '&current_page=1';
+    });
 </script>
