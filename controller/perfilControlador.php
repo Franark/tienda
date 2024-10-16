@@ -3,7 +3,6 @@ ini_set('display_errors', 1);
 require_once('../model/persona.php');
 session_start();
 
-// Actualizar información de la persona
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar'])) {
     $idPersona = $_POST['idPersona'];
     $nombrePersona = $_POST['nombrePersona'];
@@ -14,7 +13,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar'])) {
     $valorDocumento = $_POST['valorDocumento'];
     $contactos = isset($_POST['contactos']) ? $_POST['contactos'] : [];
 
-    // Crear instancia de Persona y configurar sus propiedades
     $persona = new Persona();
     $persona->setIdPersona($idPersona);
     $persona->setNombrePersona($nombrePersona);
@@ -24,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar'])) {
     $persona->setTipoDocumento($tipoDocumento);
     $persona->setValorDocumento($valorDocumento);
 
-    // Configurar contactos
     $contactosArray = [];
     foreach ($contactos as $contacto) {
         $contactosArray[] = [
@@ -34,14 +31,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['actualizar'])) {
     }
     $persona->setContactos($contactosArray);
 
-    // Actualizar persona
     $persona->actualizarPersona();
 
     header('Location: ../?page=perfil');
     exit();
 }
 
-// Eliminar contacto de la persona
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eliminarContacto'])) {
     $contactoId = $_POST['contactoId'];
 
