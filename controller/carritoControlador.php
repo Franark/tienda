@@ -16,7 +16,6 @@ if (isset($_POST['index'])) {
             $productoData = $producto->obtenerProductoPorId($idProducto);
             $stockDisponible = $productoData['stock'];
             if ($stockDisponible + $cantidadActual >= $nuevaCantidad) {
-                $producto->actualizarStock($idProducto, $cantidadActual - $nuevaCantidad);
                 $_SESSION['carrito'][$index]['cantidad'] = $nuevaCantidad;
             } else {
                 echo "No hay suficiente stock disponible para actualizar la cantidad.";
@@ -27,8 +26,6 @@ if (isset($_POST['index'])) {
         $productoCarrito = $_SESSION['carrito'][$index];
         $idProducto = $productoCarrito['idProducto'];
         $cantidad = $productoCarrito['cantidad'];
-        $producto = new Producto();
-        $producto->actualizarStock($idProducto, $cantidad);
         unset($_SESSION['carrito'][$index]);
         $_SESSION['carrito'] = array_values($_SESSION['carrito']);
     }

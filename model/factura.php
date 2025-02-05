@@ -1,5 +1,5 @@
 <?php
-require_once('conexion.php'); // Asegúrate de que este archivo tenga la conexión a la base de datos
+require_once('conexion.php');
 
 class Factura {
     private $idFactura;

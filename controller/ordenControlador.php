@@ -1,4 +1,8 @@
 <?php
+
+ini_set('display_errors',1);
+ini_set('display_startup_errors',1);
+error_reporting(E_ALL);
 require_once('../model/orden.php');
 require_once('../model/envio.php');
 
@@ -20,12 +24,13 @@ if (isset($_GET['accion'])) {
                 $nuevoEstado = $_GET['estado'];
                 if ($orden->cambiarEstado($nuevoEstado)) {
                     manejarEnvio($envio, $idOrden);
-                    header("Location: ../?page=gestionEnvios&mensaje=Estado cambiado correctamente");
+                    header("Location: ../?page=gestionOrdenes&mensaje=Estado cambiado correctamente");  // Cambié esta línea
                 } else {
-                    header("Location: ../?page=gestionEnvios&error=No se pudo cambiar el estado de la orden.");
+                    header("Location: ../?page=gestionOrdenes&error=No se pudo cambiar el estado de la orden.");  // Cambié esta línea
                 }
             }
             break;
+        
 
         case 'aceptarOrden':
             if ($idOrden) {
@@ -33,12 +38,12 @@ if (isset($_GET['accion'])) {
                 if ($idEnvio) {
                     $envio->setIdEnvio($idEnvio);
                     if ($envio->cambiarEstadoEnvio('En entrega')) {
-                        header("Location: ../?page=gestionEnvios&mensaje=Has aceptado la orden para delivery.");
+                        header("Location: ../?page=gestionOrdenes&mensaje=Has aceptado la orden para delivery.");
                     } else {
-                        header("Location: ../?page=gestionEnvios&error=No se pudo aceptar la orden.");
+                        header("Location: ../?page=gestionOrdenes&error=No se pudo aceptar la orden.");
                     }
                 } else {
-                    header("Location: ../?page=gestionEnvios&error=No se encontró un envío asociado a esta orden.");
+                    header("Location: ../?page=gestionOrdenes&error=No se encontró un envío asociado a esta orden.");
                 }
             }
             break;
@@ -49,12 +54,12 @@ if (isset($_GET['accion'])) {
                 if ($idEnvio) {
                     $envio->setIdEnvio($idEnvio);
                     if ($envio->cambiarEstadoEnvio('Entregado')) {
-                        header("Location: ../?page=gestionEnvios&mensaje=Entrega completada exitosamente.");
+                        header("Location: ../?page=gestionOrdenes&mensaje=Entrega completada exitosamente.");
                     } else {
-                        header("Location: ../?page=gestionEnvios&error=No se pudo completar la entrega.");
+                        header("Location: ../?page=gestionOrdenes&error=No se pudo completar la entrega.");
                     }
                 } else {
-                    header("Location: ../?page=gestionEnvios&error=No se encontró un envío asociado a esta orden.");
+                    header("Location: ../?page=gestionOrdenes&error=No se encontró un envío asociado a esta orden.");
                 }
             }
             break;
@@ -71,9 +76,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $orden = new Orden();
 
     switch ($accion) {
-        case 'cancelarOrden':
+        case 'cancelarPedido':
             $resultado = $orden->actualizarEstadoOrden($idOrden, 'Cancelado');
-            echo $resultado ? "OK" : "Error al cancelar el pedido.";
+            echo $resultado ? json_encode(['success' => true]) : json_encode(['success' => false, 'message' => 'Error al cancelar el pedido.']);
             break;
         case 'cambiarEstado':
             $nuevoEstado = $_GET['estado'];
@@ -92,7 +97,7 @@ function manejarEnvio($envio, $idOrden) {
         $envio->setFechaEnvio(date('Y-m-d H:i:s'));
         $envio->setEstadoEnvio('Pendiente'); 
         if (!$envio->crearEnvio()) {
-            header("Location: ../?page=gestionEnvios&error=Error al crear un nuevo envío.");
+            header("Location: ../?page=gestionOrdenes&error=Error al crear un nuevo envío.");
             exit();
         }
     }

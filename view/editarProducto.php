@@ -52,12 +52,27 @@
         <label for="fechaVencimiento">Fecha de Vencimiento:</label>
         <input type="date" id="fechaVencimiento" name="fechaVencimiento" value="<?php echo $p['fechaVencimiento']; ?>">
         <br>
-        
-        <label for="imagen">Imagen:</label>
-        <input type="file" id="imagen" name="imagen">
-        <input type="hidden" name="imagenActual" value="<?php echo $p['imagen']; ?>">
-        <br>
-        
+        <label>Imágenes actuales:</label>
+        <?php 
+        $imagenes = $producto->obtenerImagenesPorProducto($id);
+        if (!empty($imagenes)): ?>
+            <div id="imagenesActuales">
+                <?php foreach ($imagenes as $imagen): ?>
+                    <div class="imagen-item">
+                        <img src="/tienda/assets/<?php echo $imagen['imagen']; ?>" alt="Imagen" width="100">
+                        <label>
+                            <input type="checkbox" name="eliminarImagenes[]" value="<?php echo $imagen['imagen']; ?>">
+                            Eliminar
+                        </label>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        <?php else: ?>
+            <p>No hay imágenes subidas para este producto.</p>
+        <?php endif; ?>
+
+        <label for="nuevasImagenes">Añadir nuevas imágenes:</label>
+        <input type="file" id="nuevasImagenes" name="nuevasImagenes[]" multiple>
         <label for="marca_idMarca">Marca:</label>
         <select id="marca_idMarca" name="marca_idMarca">
             <?php
@@ -92,7 +107,7 @@
 const today = new Date().toISOString().split('T')[0];
 document.getElementById('fechaVencimiento').setAttribute('min', today);
 
-document.getElementById('editarProductoForm').addEventListener('submit', function (event) {  // Aquí el ID corregido
+document.getElementById('editarProductoForm').addEventListener('submit', function (event) {
     let nombreProducto = document.getElementById('nombreProducto').value.trim();
     let codigoBarras = document.getElementById('codigoBarras').value.trim();
     let precio = document.getElementById('precio').value;

@@ -77,6 +77,75 @@ class CategoriaProducto {
         return $categoria;
     }
 
+    public function listarCategoriasPaginadas($current_page, $page_size) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $offset = ($current_page - 1) * $page_size;
+    
+        $query = "SELECT * FROM categoriaProducto LIMIT $offset, $page_size";
+        $result = $conn->query($query);
+    
+        $categorias = [];
+        while ($row = $result->fetch_assoc()) {
+            $categorias[] = $row;
+        }
+    
+        $conexion->desconectar();
+        return $categorias;
+    }
+    
+    public function buscarCategorias($search_query, $current_page, $page_size) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $offset = ($current_page - 1) * $page_size;
+    
+        $query = "SELECT * FROM categoriaProducto WHERE nombreCategoria LIKE ? LIMIT $offset, $page_size";
+        $stmt = $conn->prepare($query);
+        $search_param = '%' . $search_query . '%';
+        $stmt->bind_param('s', $search_param);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $categorias = [];
+        while ($row = $result->fetch_assoc()) {
+            $categorias[] = $row;
+        }
+    
+        $conexion->desconectar();
+        return $categorias;
+    }
+    
+    public function cantidadCategorias() {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "SELECT COUNT(*) as total FROM categoriaProducto";
+        $result = $conn->query($query);
+    
+        $row = $result->fetch_assoc();
+        $conexion->desconectar();
+    
+        return $row['total'];
+    }
+    
+    public function contarCategorias($search_query) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "SELECT COUNT(*) as total FROM categoriaProducto WHERE nombreCategoria LIKE ?";
+        $stmt = $conn->prepare($query);
+        $search_param = '%' . $search_query . '%';
+        $stmt->bind_param('s', $search_param);
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $row = $result->fetch_assoc();
+        $conexion->desconectar();
+    
+        return $row['total'];
+    }
+    
+
     /**
      * Get the value of idCategoriaProducto
      */ 

@@ -1,4 +1,5 @@
-<h1>Gestión de Órdenes</h1>
+<header>
+    <h1>Gestión de Órdenes</h1>
 </header>
 <main>
     <h2 onclick="toggleTable('pendientes')" style="cursor: pointer;">
@@ -11,6 +12,7 @@
                 <th>Cliente</th>
                 <th>Fecha</th>
                 <th>Total</th>
+                <th>Ver mas</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -28,6 +30,7 @@
                 <th>Cliente</th>
                 <th>Fecha</th>
                 <th>Total</th>
+                <th>Ver mas</th>
                 <th>Acciones</th>
             </tr>
         </thead>
@@ -44,8 +47,8 @@
                 <th>Número del pedido</th>
                 <th>Cliente</th>
                 <th>Fecha</th>
+                <th>Ver mas</th>
                 <th>Total</th>
-                <th>Acciones</th>
             </tr>
         </thead>
         <tbody id="entregadosBody"></tbody>
@@ -61,6 +64,7 @@
                 <th>Número del pedido</th>
                 <th>Cliente</th>
                 <th>Fecha</th>
+                <th>Ver mas</th>
                 <th>Total</th>
             </tr>
         </thead>
@@ -128,29 +132,116 @@
         };
         xhr.send();
     }
+
     function cancelarPedido(idOrden) {
-        if (confirm("¿Estás seguro de que deseas cancelar este pedido?")) {
-            fetch('controller/ordenControlador.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({
-                    accion: 'cancelarOrden',
-                    idOrden: idOrden
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¡No podrás recuperar esta acción!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Sí, cancelar',
+            cancelButtonText: 'No, mantener'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('controller/ordenControlador.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        accion: 'cancelarPedido',
+                        idOrden: idOrden
+                    })
                 })
-            })
-            .then(response => response.text())
-            .then(data => {
-                if (data === 'OK') {
-                    alert('Pedido cancelado correctamente.');
-                    location.reload();
-                } else {
-                    alert('Error al cancelar el pedido.');
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        }
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        actualizarStock(data.productos, 'cancelado');
+                        mostrarAlertaExito('Pedido cancelado correctamente.');
+                        location.reload();
+                    } else {
+                        mostrarAlertaError('Hubo un problema al cancelar la orden.');
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
     }
 
+    function aceptarOrden(idOrden) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "¿Deseas aceptar esta orden?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, aceptar',
+            cancelButtonText: 'No, volver'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('controller/ordenControlador.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({
+                        accion: 'aceptarOrden',
+                        idOrden: idOrden
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        actualizarStock(data.productos, 'aceptado');
+                        Swal.fire(
+                            'Aceptado!',
+                            'La orden ha sido aceptada.',
+                            'success'
+                        ).then(() => {
+                            location.reload();
+                        });
+                    } else {
+                        Swal.fire(
+                            'Error!',
+                            'Hubo un problema al aceptar la orden.',
+                            'error'
+                        );
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        });
+    }
+
+    function actualizarStock(productos, accion) {
+        productos.forEach(producto => {
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "controller/productoControlador.php", true);
+            xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+            xhr.send(new URLSearchParams({
+                idProducto: producto.idProducto,
+                cantidad: producto.cantidad,
+                accion: accion
+            }));
+        });
+    }
+
+    function mostrarAlertaExito(mensaje) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: mensaje,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    function mostrarAlertaError(mensaje) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: mensaje,
+            confirmButtonText: 'Aceptar'
+        });
+    }
 
     inicializarPaginacion('pendientes');
     inicializarPaginacion('enProceso');

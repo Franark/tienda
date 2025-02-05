@@ -4,7 +4,7 @@ require_once('../model/envio.php');
 
 $tabla = isset($_GET['tabla']) ? $_GET['tabla'] : 'pendientes';
 
-$envio = new Envio(); // Asegúrate de que la clase exista
+$envio = new Envio();
 
 switch ($tabla) {
     case 'pendientes':

@@ -43,10 +43,16 @@ if (isset($_POST['submit'])) {
 
                     if ($nombreRol == 'Administrador') {
                         header('Location: ../?page=gestionUsuarios');
-                    } else {
+                    } elseif ($nombreRol == 'Cliente') {
                         header('Location: ../?page=catalogoProductos');
+                    } elseif ($nombreRol == 'Empleado') {
+                        header('Location: ../?page=gestionInventario');
+                    } elseif ($nombreRol == 'Repartidor') {
+                        header('Location: ../?page=seguimientoPedidos');
+                    } else {
+                        header('Location: ../?page=login&error=Rol desconocido');
                     }
-                    exit();
+                    exit();      
                 } else {
                     header('Location: ../?page=login&error=Error al obtener el rol del usuario');
                     exit();

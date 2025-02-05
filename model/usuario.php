@@ -1,5 +1,6 @@
 <?php
 require_once("conexion.php");
+require_once("paginacion.php");
 
 class Usuario{
     public $id;
@@ -18,21 +19,147 @@ class Usuario{
         $this->confirmacion = $confirmacion;
     }    
 
-    public function listarUsuarios() {
+    public function listarUsuarios($current_page, $page_size) {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
-        $query = "SELECT u.idUsuario, u.nickname, u.email, r.nombreRol 
-                  FROM usuario u
-                  JOIN rolUsuario r ON u.rolUsuario_idRolUsuario = r.idRolUsuario";
+        
+        $offset = ($current_page - 1) * $page_size;
+        $query = "SELECT u.idUsuario, u.nickname, u.email, r.nombreRol FROM usuario u JOIN rolUsuario r ON u.rolUsuario_idRolUsuario = r.idRolUsuario LIMIT $offset, $page_size";
+        
         $result = $conn->query($query);
+        $usuarios = $result->fetch_all(MYSQLI_ASSOC);
+        
+        $conexion->desconectar();
+        return $usuarios;
+    }
+    
+    
 
+    public function buscarUsuarios($search_query, $current_page, $page_size) {
+        $offset = ($current_page - 1) * $page_size;
+    
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "SELECT u.idUsuario, u.nickname, u.email, r.nombreRol
+                  FROM usuario u
+                  JOIN rolUsuario r ON u.rolUsuario_idRolUsuario = r.idRolUsuario
+                  WHERE u.nickname LIKE ? OR u.email LIKE ?
+                  LIMIT ?, ?";
+        $stmt = $conn->prepare($query);
+        $search = "%$search_query%";
+        $stmt->bind_param('ssii', $search, $search, $offset, $page_size);
+        $stmt->execute();
+    
+        $result = $stmt->get_result();
         $usuarios = [];
         while ($row = $result->fetch_assoc()) {
             $usuarios[] = $row;
         }
-
+    
         $conexion->desconectar();
         return $usuarios;
+    }    
+
+    public function listarUsuariosPorRol($rolId) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        // Consulta para obtener todos los usuarios por rol
+        $query = "SELECT u.idUsuario, u.nickname, u.email, r.nombreRol 
+                  FROM usuario u
+                  JOIN rolUsuario r ON u.rolUsuario_idRolUsuario = r.idRolUsuario
+                  WHERE u.rolUsuario_idRolUsuario = ?";
+    
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $rolId); // El rol es un entero
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $usuarios = [];
+        while ($row = $result->fetch_assoc()) {
+            $usuarios[] = $row;
+        }
+    
+        $conexion->desconectar();
+        return $usuarios;
+    }
+    
+
+    public function buscarUsuariosPorRol($search_query, $roleFilter, $current_page, $page_size) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        
+        $query = "SELECT u.idUsuario, u.nickname, u.email, r.nombreRol 
+                  FROM usuario u
+                  JOIN rolUsuario r ON u.rolUsuario_idRolUsuario = r.idRolUsuario
+                  WHERE u.nickname LIKE ? AND u.rolUsuario_idRolUsuario = ?
+                  LIMIT ?, ?";
+    
+        $stmt = $conn->prepare($query);
+        $search_query = "%$search_query%"; // Agregar comodín para la búsqueda parcial
+        $stmt->bind_param("ssii", $search_query, $roleFilter, $current_page, $page_size); 
+        $stmt->execute();
+        $result = $stmt->get_result();
+    
+        $usuarios = [];
+        while ($row = $result->fetch_assoc()) {
+            $usuarios[] = $row;
+        }
+    
+        $conexion->desconectar();
+        return $usuarios;
+    }
+    
+    
+
+    public function contarUsuariosPorRol($search_query, $roleFilter) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        
+        $query = "SELECT COUNT(*) as totalUsuarios 
+                  FROM usuario u
+                  JOIN rolUsuario r ON u.rolUsuario_idRolUsuario = r.idRolUsuario
+                  WHERE u.nickname LIKE ? AND u.rolUsuario_idRolUsuario = ?";
+    
+        $stmt = $conn->prepare($query);
+        $search_query = "%$search_query%"; 
+        $stmt->bind_param("ss", $search_query, $roleFilter); 
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $row = $result->fetch_assoc();
+    
+        $conexion->desconectar();
+        return $row['totalUsuarios'];
+    }
+    
+    
+
+
+    public function contarUsuarios($search_query = '') {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        
+        $query = "SELECT COUNT(*) as total FROM usuario WHERE 1=1";
+        
+        if ($search_query) {
+            $query .= " AND nickname LIKE '%$search_query%'";
+        }
+        
+        $result = $conn->query($query);
+        $row = $result->fetch_assoc();
+        $conexion->desconectar();
+        return $row['total'];
+    }
+    
+    public function cantidadUsuarios(){
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "SELECT COUNT(*) as total FROM usuario WHERE confirmacion = 1";
+        $result = $conn->query($query);
+        $row = $result->fetch_assoc();
+        $conexion->desconectar();
+        return $row['total'];
     }
 
     public function crearUsuario($nombrePersona, $apellidoPersona, $edadPersona, $tipoSexo_idTipoSexo) {
@@ -130,10 +257,18 @@ class Usuario{
     public function actualizar() {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
-        $passwordHash = password_hash($this->password, PASSWORD_DEFAULT);
-        $query = "UPDATE usuario SET nickname = '$this->nickname', email = '$this->email', password = '$passwordHash', rolUsuario_idRolUsuario = '$this->rolUsuario_idRolUsuario' WHERE idUsuario = '$this->id'";
-        return $conexion->insertar($query);
-    }
+        $query = "UPDATE usuario SET nickname = ?, email = ?, rolUsuario_idRolUsuario = ? WHERE idUsuario = ?";
+        
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param('ssii', $this->nickname, $this->email, $this->rolUsuario_idRolUsuario, $this->id);
+        
+        if ($stmt->execute()) {
+            return true;
+        } else {
+            error_log("Error al actualizar el usuario: " . $stmt->error);
+            return false;
+        }
+    }    
 
     public function eliminar($id) {
         $conexion = new Conexion();
@@ -168,7 +303,7 @@ class Usuario{
             if (password_verify($password, $user['password'])) {
                 if ($user['confirmacion'] == 1) {
                     return true;
-                } else {
+                } elseif ($user['confirmacion'] == 0) {
                     header('Location: ../?page=login&error=Por favor confirma tu cuenta antes de iniciar sesión.');
                     exit();
                 }

@@ -37,15 +37,41 @@
     </div>
 
     <label for="porcentaje">Porcentaje de ajuste:</label>
-    <input type="number" name="porcentaje" step="0.01" required>
+    <input type="number" name="porcentaje" step="0.01" min="0.01" required>
 
     <button type="submit">Actualizar Precios</button>
 </form>
+<?php
+if (isset($_GET['success'])) {
+    echo "<script>
+        Swal.fire({
+            icon: 'success',
+            title: '¡Éxito!',
+            text: '{$_GET['success']}',
+            confirmButtonText: 'Aceptar'
+        });
+    </script>";
+}
+
+if (isset($_GET['error'])) {
+    echo "<script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: '{$_GET['error']}',
+            confirmButtonText: 'Aceptar'
+        });
+    </script>";
+}
+?>
 
 <script>
 function mostrarOpciones() {
     var tipo = document.getElementById('tipo').value;
     document.getElementById('opcionesMarca').style.display = (tipo === 'marca') ? 'block' : 'none';
     document.getElementById('opcionesCategoria').style.display = (tipo === 'categoria') ? 'block' : 'none';
+}
+if (window.location.search.includes('success') || window.location.search.includes('error')) {
+    history.replaceState({}, document.title, window.location.pathname);
 }
 </script>

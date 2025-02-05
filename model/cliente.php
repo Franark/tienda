@@ -75,7 +75,7 @@ public function obtenerClientePorId($idCliente) {
             'idPersona' => $row['idPersona'],
             'nombre' => $row['nombrePersona'],
             'apellido' => $row['apellidoPersona'],
-            'correoElectronico' => $row['correoElectronico']  // Guardar el correo electrónico
+            'correoElectronico' => $row['correoElectronico']
         ];
     }
     $conexion->desconectar();

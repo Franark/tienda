@@ -14,14 +14,17 @@ class Conexion {
     }
 
     public function conectar() {
-        $this->conn = new mysqli($this->server, $this->username, $this->password, $this->db);
-        
-        if ($this->conn->connect_error) {
-            die("Error de conexión: " . $this->conn->connect_error);
+        try {
+            $this->conn = new mysqli($this->server, $this->username, $this->password, $this->db);
+            if ($this->conn->connect_error) {
+                throw new Exception("Error de conexión: " . $this->conn->connect_error);
+            }
+            return $this->conn;
+        } catch (Exception $e) {
+            die($e->getMessage());
         }
-
-        return $this->conn;
     }
+    
 
     public function desconectar() {
         return $this->conn->close();   

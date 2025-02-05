@@ -45,7 +45,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['editar'])) {
     $categoria->actualizarCategoria($idCategoriaProducto, $nombreCategoria);
     header('Location: ../?page=gestionCategorias&success=Categoría actualizada exitosamente.');
 }
-
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['accion']) && $_GET['accion'] === 'eliminar') {
     $idCategoriaProducto = $_GET['idCategoriaProducto'];
 
@@ -54,8 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['accion']) && $_GET['acc
         header('Location: ../?page=gestionCategorias&success=Categoría eliminada con éxito');
     } else {
         header('Location: ../?page=gestionCategorias&error=Error al eliminar la categoría');
-        exit;
+        exit();
     }
 }
+
 
 ?>

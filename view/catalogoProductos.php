@@ -1,5 +1,5 @@
 <?php
-$page_size = 8;
+$page_size = 4;
 $current_page = isset($_GET['current_page']) ? max(1, intval($_GET['current_page'])) : 1;
 $search_query = isset($_GET['search_query']) ? $_GET['search_query'] : '';
 $categoriaProducto_idCategoriaProducto = isset($_GET['categoriaProducto_idCategoriaProducto']) ? $_GET['categoriaProducto_idCategoriaProducto'] : '';
@@ -14,7 +14,7 @@ if ($search_query || $categoriaProducto_idCategoriaProducto || $marca_idMarca) {
     $productos = $producto->buscarProductos($search_query, '', $marca_idMarca, $categoriaProducto_idCategoriaProducto, $current_page, $page_size);
     $cantidadProductos = $producto->contarProductos($search_query, '', $marca_idMarca, $categoriaProducto_idCategoriaProducto);
 } else {
-    $productos = $producto->listarProductos();
+    $productos = $producto->listarProductosClientes();
     $cantidadProductos = $producto->cantidadProductos();
 }
 
@@ -53,14 +53,19 @@ $total_pages = ceil($cantidadProductos / $page_size);
     <div class="productos">
         <?php foreach ($productos as $p): ?>
             <div class="producto">
-                <img src="assets/<?php echo $p['imagen']; ?>" alt="<?php echo $p['nombreProducto']; ?>">
-                <h2><?php echo $p['nombreProducto']; ?></h2>
+                <?php
+                $imagenPrincipal = !empty($p['imagenes']) ? $p['imagenes'][0] : 'default-image.jpg';
+                ?>
+                <img src="assets/<?php echo htmlspecialchars($imagenPrincipal); ?>" alt="<?php echo htmlspecialchars($p['nombreProducto']); ?>">
+                <h2><?php echo htmlspecialchars($p['nombreProducto']); ?></h2>
                 <p>Precio: $<?php echo number_format($p['precio'], 2, ',', '.'); ?></p>
-                <p><?php echo $p['nombreMarca']; ?></p>
+                <p><?php echo htmlspecialchars($p['nombreMarca']); ?></p>
                 <a href="?page=verProducto&idProducto=<?php echo $p['idProducto']; ?>">Ver más</a>
             </div>
         <?php endforeach; ?>
     </div>
+
+
 
     <nav class="pagination">
         <ul>
@@ -84,8 +89,6 @@ document.querySelectorAll('#categoriaDropdown a').forEach(function(element) {
         e.preventDefault();
         document.querySelectorAll('#categoriaDropdown a').forEach(a => a.classList.remove('selected'));
         this.classList.add('selected');
-        
-        // Redirigir inmediatamente después de seleccionar una categoría
         var searchQuery = document.getElementById('buscarProducto').value;
         var categoriaId = this.dataset.categoriaId;
         var marcaId = document.querySelector('#marcaDropdown a.selected') ? document.querySelector('#marcaDropdown a.selected').dataset.marcaId : '';
@@ -98,8 +101,6 @@ document.querySelectorAll('#marcaDropdown a').forEach(function(element) {
         e.preventDefault();
         document.querySelectorAll('#marcaDropdown a').forEach(a => a.classList.remove('selected'));
         this.classList.add('selected');
-        
-        // Redirigir inmediatamente después de seleccionar una marca
         var searchQuery = document.getElementById('buscarProducto').value;
         var marcaId = this.dataset.marcaId;
         var categoriaId = document.querySelector('#categoriaDropdown a.selected') ? document.querySelector('#categoriaDropdown a.selected').dataset.categoriaId : '';

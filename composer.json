@@ -1,10 +1,19 @@
 {
     "name": "francisco/tienda",
-    "autoload":{
-        "model\\":"model/"
+    "autoload": {
+        "psr-4": {
+            "Francisco\\Tienda\\": "src/"
+        }
     },
+    "authors": [
+        {
+            "name": "francisco"
+        }
+    ],
     "require": {
-        "ajaz/random-quotes-generator-php": "^1.0",
+        "phpoffice/phpspreadsheet": "^3.5",
+        "mercadopago/dx-php": "^3.0",
+        "dompdf/dompdf": "^3.0",
         "phpmailer/phpmailer": "^6.9"
     }
 }

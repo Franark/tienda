@@ -83,6 +83,12 @@ nav a:hover {
     margin-bottom: 20px;
 }
 
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #3498db;
+}
+
 .main-content p {
     font-size: 16px;
     line-height: 1.6;
@@ -153,7 +159,7 @@ nav a:hover {
 
 .btn {
     display: inline-block;
-    padding: 10px 20px;
+    padding: 8px 16px;
     font-size: 16px;
     border-radius: 5px;
     text-decoration: none;
@@ -187,13 +193,13 @@ nav a:hover {
 }
 
 header {
-    background-color: #333;
+    text-align: center;
     padding: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    color: #fff;
+    background-color: #333;
+    margin-bottom: 20px;
+    border-radius: 8px;
 }
+
 
 .header-logo {
     font-size: 24px;
@@ -380,6 +386,39 @@ nav.pagination {
     border-color: #2980b9;
 }
 
+.btn-ver-mas {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.btn-ver-mas:hover {
+    background-color: #0056b3;
+}
+
+.producto a {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007BFF;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.producto a:hover {
+    background-color: #0056b3;
+}
+
+
 table {
     width: 100%;
     border-collapse: collapse;
@@ -415,13 +454,26 @@ button {
 button:hover {
     background-color: #0056b3;
 }
-Estilos para la 
+
 .productos {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 20px;
     margin-top: 20px;
 }
+
+.productos-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.producto-item {
+    width: 200px; 
+    margin: 10px;
+}
+
+
 
 .producto {
     background-color: #fff;
@@ -632,7 +684,7 @@ input[type="checkbox"] {
 
 @media (max-width: 768px) {
     .sidebar {
-        left: -270px;
+        left: -290px;
         transition: left 0.3s ease;
     }
 
@@ -680,6 +732,7 @@ input[type="checkbox"] {
     margin-bottom: 10px;
 }
 
+
 .notifications-toggle:hover {
     background-color: #2980b9;
 }
@@ -690,11 +743,22 @@ input[type="checkbox"] {
     background-color: #ecf0f1;
     border-radius: 5px;
     margin-top: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    display: none;
 }
-
 .notifications-list li {
     margin-bottom: 10px;
     font-size: 14px;
+    padding: 5px 10px;
+    border-radius: 3px;
+    transition: background-color 0.2s ease;
+}
+
+
+
+.notifications-list.visible {
+    display: block;
 }
 
 .notification-dot {
@@ -708,23 +772,49 @@ input[type="checkbox"] {
 }
 
 .notification-icon {
+    font-size: 18px;
     position: relative;
-    font-size: 15px;
-    color: #fff;
+    color: white;
     cursor: pointer;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .notification-icon .notification-count {
     position: absolute;
-    top: -5px;
-    right: -5px;
+    top: -8px;
+    right: -8px;
     background-color: red;
     color: white;
     font-size: 12px;
-    padding: 3px 6px;
+    padding: 4px 6px;
     border-radius: 50%;
-    display: inline-block;
     text-align: center;
+    animation: pulse 1s infinite;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+}
+
+.notification-icon .notification-count.hidden {
+    display: none;
+}
+
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+    }
 }
 
 .notification-text {
@@ -732,6 +822,29 @@ input[type="checkbox"] {
     color: #fff;
     font-size: 15px;
 }
+
+.notifications-list li.leido {
+    color: #7f8c8d;
+    background-color: #ecf0f1;
+}
+
+.notifications-list li:hover {
+    background-color: #bdc3c7;
+}
+
+#notifications-list {
+    display: none;
+    position: absolute; /* Esto puede ajustarse según tu diseño */
+    background-color: #fff;
+    border: 1px solid #ccc;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 
 .dropdown {
     position: relative;
@@ -778,8 +891,298 @@ input[type="checkbox"] {
     padding: 8px 16px;
     background-color: #dc3545;
     color: white;
+    margin-left: 5px;
+    border-radius: 5px;
 }
 
 .btn-danger:hover {
     background-color: #c82333;
+}
+
+button#searchButton {
+    padding: 10px 15px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px; 
+    font-size: 15px; 
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+}
+
+button#applyFilterButton {
+    padding: 12px 2px; 
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 8px; 
+    font-size: 16px; 
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); 
+    margin-left: 15px; /* Separación entre los botones */
+    white-space: nowrap; /* Evita que el texto se divida en varias líneas */
+    min-width: 120px; /* Asegura que el botón tenga un ancho mínimo */
+}
+
+button#searchButton:hover,
+button#applyFilterButton:hover {
+    background-color: #2980b9;
+    transform: scale(1.05); 
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3); 
+}
+
+.search-container,
+.filter-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.search-container input,
+.filter-container select {
+    padding: 10px;
+    margin-right: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+@media (max-width: 768px) {
+    .search-container,
+    .filter-container {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-container input,
+    .filter-container select {
+        margin-right: 0;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    
+    button#searchButton,
+    button#applyFilterButton {
+        width: 100%;
+        margin-top: 10px;
+
+    }
+}
+
+form .input-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+form .input-group img.icon {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    left: 20px;
+    top: 40%;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+form .input-group input {
+    width: 100%;
+    padding: 10px;
+    padding-left: 45px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+@media (max-width: 768px) {
+    form .input-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    form .input-group img.icon {
+        left: 310px;
+        top: 40%;
+    }
+
+    form .input-group input {
+        padding-left: 10px;
+    }
+}
+
+@media (min-width: 769px) {
+    form {
+        padding: 40px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 10px;
+    }
+
+    form .input-group {
+        margin-bottom: 25px;
+    }
+
+    form .input-group img.icon {
+        left: 360px;
+    }
+
+    form .input-group input {
+        padding-left: 10px;
+    }
+}
+
+form button {
+    width: 100%;
+    padding: 12px;
+    background-color: #3498db;
+    border: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+form button:hover {
+    background-color: #2980b9;
+}
+
+.btn-cancelar {
+    background-color: #ff4d4d;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer; 
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+.btn-cancelar:hover {
+    background-color: #ff1a1a;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.pagination a {
+    margin: 0 5px;
+    padding: 8px 12px;
+    text-decoration: none;
+    border: 1px solid #ddd;
+    color: #007bff;
+}
+
+.pagination a.active {
+    background-color: #007bff;
+    color: white;
+}
+
+.pagination a:hover {
+    background-color: #ddd;
+}
+
+.notifications-list .ver-todas {
+    text-align: center;
+    display: block;
+    padding: 10px;
+    color: #3498db;
+    text-decoration: none;
+    border-top: 1px solid #ccc;
+}
+
+.notifications-list .ver-todas:hover {
+    background-color: #f0f0f0;
+    color: #2c3e50;
+}
+
+.all-notifications-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.all-notifications-list li {
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+}
+
+.all-notifications-list li.leido {
+    color: #000;
+}
+
+.btn-volver {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #3498db;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.btn-volver:hover {
+    background-color: #2980b9;
+}
+
+textarea {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-size: 14px;
+    height: 100px;
+    resize: vertical;
+}
+
+#carousel {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+#carousel img {
+    max-width: 100%;
+    max-height: 400px;
+    object-fit: contain;
+}
+
+#carousel button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+#carousel button:hover {
+    background-color: #0056b3;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 1px; 
+}
+
+.action-buttons a {
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 5px;
 }

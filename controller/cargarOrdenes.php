@@ -35,23 +35,20 @@ foreach ($ordenes as $orden) {
     echo "<td>" . $orden['usuario'] . "</td>";
     echo "<td>" . $fecha . "</td>";
     echo "<td>" . $orden['montoTotal'] . "</td>";
+    echo "<td>
+        <a href='?page=detallesOrden&idOrden=" . $orden['idOrden'] . "' class='btn btn-info btn-sm'>Ver más</a>
+    </td>";
+
 
     if ($tabla == 'pendientes') {
         echo "<td>
             <a href='controller/ordenControlador.php?accion=cambiarEstado&estado=En Proceso&idOrden=" . $orden['idOrden'] . "' 
-               class='btn btn-primary btn-sm me-2'>Iniciar</a>
-            <button onclick='cancelarPedido(" . $orden['idOrden'] . ")' class='btn btn-danger btn-sm'>Cancelar</button>
+               class='btn btn-primary btn-sm me-2' onclick='mostrarAlertaExito(\"Orden iniciada exitosamente\")'>Iniciar</a>
+            <button onclick='cancelarPedido(" . $orden['idOrden'] . ")' class='btn-danger'>Cancelar</button>
         </td>";
     } elseif ($tabla == 'enProceso') {
         echo "<td>
-            <a href='controller/ordenControlador.php?accion=aceptarOrden&idOrden=" . $orden['idOrden'] . "' 
-               class='btn btn-warning btn-sm me-2'>Aceptar</a>
             <button onclick='cancelarPedido(" . $orden['idOrden'] . ")' class='btn btn-danger btn-sm'>Cancelar</button>
-        </td>";
-    } elseif ($tabla == 'entregados') {
-        echo "<td>
-            <a href='controller/ordenControlador.php?accion=completarEntrega&idOrden=" . $orden['idOrden'] . "' 
-               class='btn btn-success btn-sm'>Completar Entrega</a>
         </td>";
     }
     echo "</tr>";

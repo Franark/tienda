@@ -1,7 +1,8 @@
 <?php
-require_once 'conexion.php';
+require_once('conexion.php');
+require_once('paginacion.php');
 
-class Marca {
+class Marca extends Paginacion {
     public $idMarca;
     public $nombreMarca;
 
@@ -9,6 +10,23 @@ class Marca {
         $this->idMarca = $idMarca;
         $this->nombreMarca = $nombreMarca;
     }
+
+    public function listarMarca($current_page, $page_size) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $offset = ($current_page - 1) * $page_size;
+        $query = "SELECT * FROM marca LIMIT $offset, $page_size";
+        $result = $conn->query($query);
+    
+        $marcas = [];
+        while ($row = $result->fetch_assoc()) {
+            $marcas[] = $row;
+        }
+    
+        $conexion->desconectar();
+        return $marcas;
+    }    
 
     public function listarMarcas() {
         $conexion = new Conexion();
@@ -84,6 +102,53 @@ class Marca {
 
         $conexion->desconectar();
         return $marca;
+    }
+
+    public function buscarMarcas($search_query, $current_page, $page_size) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+
+        $this->current_page = max(1, $this->current_page);
+        $offset = ($this->current_page - 1) * $this->page_size;
+        $query = "SELECT * FROM marca WHERE nombreMarca LIKE '%$search_query%' LIMIT $offset, $this->page_size";
+
+        $result = $conn->query($query);
+
+        $marcas = [];
+        while ($row = $result->fetch_assoc()) {
+            $marcas[] = $row;
+        }
+
+        $conexion->desconectar();
+        return $marcas;
+    }
+
+    public function contarMarcas($search_query = '') {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        if ($search_query) {
+            $query = "SELECT COUNT(*) as total FROM marca WHERE nombreMarca LIKE '%$search_query%'";
+        } else {
+            $query = "SELECT COUNT(*) as total FROM marca";
+        }
+    
+        $result = $conn->query($query);
+        $row = $result->fetch_assoc();
+        $conexion->desconectar();
+    
+        return $row['total'];
+    }
+    
+
+    public function cantidadMarcas(){
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+        $query = "SELECT COUNT(*) as total FROM marca";
+        $result = $conn->query($query);
+        $row = $result->fetch_assoc();
+        $conexion->desconectar();
+        return $row['total'];
     }
 
     /**

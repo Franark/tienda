@@ -27,4 +27,26 @@
         <input type="submit" class="boton" value="Crear">
     </form>
 </main>
-<script src="assets/javascript/usuario.js"></script>
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const successMessage = urlParams.get('success');
+    const errorMessage = urlParams.get('error');
+
+    if (successMessage) {
+        Swal.fire({
+            icon: 'success',
+            title: 'Éxito',
+            text: successMessage,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+
+    if (errorMessage) {
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: errorMessage,
+            confirmButtonText: 'Aceptar'
+        });
+    }
+</script>

@@ -1,5 +1,6 @@
 <?php
 require_once('conexion.php');
+require_once('orden.php');
 
 class Envio {
     private $idEnvio;
@@ -41,80 +42,91 @@ class Envio {
         return true;
     }    
 
-    public function cambiarEstadoEnvio($nuevoEstado) {
+    public function cambiarEstadoEnvio($nuevoEstado, $repartidorId = null) {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
-
-        $this->estadoEnvio = $nuevoEstado;
-
-        if (empty($this->fechaEnvio)) {
-            $this->setFechaEnvio(date('Y-m-d H:i:s'));
-        }
-    
-        $query = "UPDATE envio SET estadoEnvio = ?, fechaEnvio = ? WHERE idEnvio = ?";
-
+        $query = "UPDATE envio SET estadoEnvio = ?, repartidor_idUsuario = ? WHERE idEnvio = ?";
         $stmt = $conn->prepare($query);
-        $stmt->bind_param("ssi", $nuevoEstado, $this->fechaEnvio, $this->idEnvio);
+        $stmt->bind_param("sii", $nuevoEstado, $repartidorId, $this->idEnvio);
+    
+        error_log("Consulta SQL: " . $query . " - Valores: $nuevoEstado, $repartidorId, $this->idEnvio");
     
         if ($stmt->execute()) {
-            if ($stmt->affected_rows > 0) {
-                $stmt->close();
-                $conexion->desconectar();
-                return true;
-            } else {
-                error_log("No se actualizó ninguna fila para idEnvio: " . $this->idEnvio);
-            }
-        } else {
-            error_log("Error al ejecutar la actualización: " . $stmt->error);
-        }
-    
-        $stmt->close();
-        $conexion->desconectar();
-        return false;
-    }
-    
-    public function listarEnviosEnProceso($limite, $offset) {
-        $conexion = new Conexion();
-        $conn = $conexion->conectar();
-    
-        $query = "SELECT e.idEnvio, e.fechaEnvio, e.estadoEnvio, o.idOrden, u.nickname
-          FROM envio e
-          JOIN orden o ON e.orden_idOrden = o.idOrden
-          JOIN cliente c ON o.cliente_idCliente = c.idCliente
-          JOIN persona pe ON pe.idPersona = c.persona_idPersona
-          JOIN usuario u ON pe.usuario_idUsuario = u.idUsuario
-          WHERE e.estadoEnvio =  'En Proceso'
-          LIMIT ? OFFSET ?";
-
-    
-        $stmt = $conn->prepare($query);
-        $stmt->bind_param("ii", $limite, $offset);
-    
-        if ($stmt->execute()) {
-            $result = $stmt->get_result();
-            $envios = [];
-    
-            while ($fila = $result->fetch_assoc()) {
-                $envios[] = $fila;
-            }
-    
+            error_log("Actualización exitosa.");
             $stmt->close();
             $conexion->desconectar();
-            return $envios;
+            return true;
         } else {
             error_log("Error en la consulta: " . $stmt->error);
             $stmt->close();
             $conexion->desconectar();
-            return [];
+            return false;
         }
     }
     
+    
+    
+    
+    
+    private function actualizarEstadoOrden($nuevoEstadoOrden) {
+        $idOrden = $this->obtenerIdOrden();
+    
+        if ($idOrden) {
+            $orden = new Orden();
+            $orden->setOrdenIdOrden($idOrden);
+            $orden->cambiarEstado($nuevoEstadoOrden);
+        } else {
+            echo "No se encontró una orden asociada al envío.";
+        }
+    }
+    
+    private function obtenerIdOrden() {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "SELECT orden_idOrden FROM envio WHERE idEnvio = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $this->idEnvio);
+        $stmt->execute();
+        $stmt->bind_result($idOrden);
+        $stmt->fetch();
+        $stmt->close();
+        $conexion->desconectar();
+    
+        return $idOrden;
+    }    
 
+    
+    public function listarEnviosEnProceso($idRepartidor, $limite, $offset) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "SELECT e.idEnvio, e.fechaEnvio, e.estadoEnvio, o.idOrden, u.nickname
+                  FROM envio e
+                  JOIN orden o ON e.orden_idOrden = o.idOrden
+                  JOIN cliente c ON o.cliente_idCliente = c.idCliente
+                  JOIN persona pe ON pe.idPersona = c.persona_idPersona
+                  JOIN usuario u ON pe.usuario_idUsuario = u.idUsuario
+                  WHERE e.estadoEnvio = 'En Proceso' AND e.repartidor_idUsuario = ?
+                  LIMIT ? OFFSET ?";
+    
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("iii", $idRepartidor, $limite, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $envios = $result->fetch_all(MYSQLI_ASSOC);
+    
+        $stmt->close();
+        $conn->close();
+    
+        return $envios;
+    }
+    
     public function listarEnviosPendientes($limite, $offset) {
         $conexion = new Conexion();
         $conn = $conexion->conectar();
     
-        $query = "SELECT DISTINCT e.idEnvio, e.fechaEnvio, e.estadoEnvio, o.idOrden, u.nickname
+        $query = "SELECT e.idEnvio, e.fechaEnvio, e.estadoEnvio, o.idOrden, u.nickname
                   FROM envio e
                   JOIN orden o ON e.orden_idOrden = o.idOrden
                   JOIN cliente c ON o.cliente_idCliente = c.idCliente
@@ -125,24 +137,64 @@ class Envio {
     
         $stmt = $conn->prepare($query);
         $stmt->bind_param("ii", $limite, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $envios = $result->fetch_all(MYSQLI_ASSOC);
     
-        if ($stmt->execute()) {
-            $result = $stmt->get_result();
-            $envios = [];
+        $stmt->close();
+        $conn->close();
     
-            while ($fila = $result->fetch_assoc()) {
-                $envios[] = $fila;
-            }
+        return $envios;
+    }
     
-            $stmt->close();
-            $conexion->desconectar();
-            return $envios;
-        } else {
-            error_log("Error en la consulta: " . $stmt->error);
-            $stmt->close();
-            $conexion->desconectar();
-            return [];
-        }
+    public function listarEnviosEntregados($idRepartidor, $limite, $offset) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "SELECT e.idEnvio, e.fechaEnvio, e.estadoEnvio, o.idOrden, u.nickname
+                  FROM envio e
+                  JOIN orden o ON e.orden_idOrden = o.idOrden
+                  JOIN cliente c ON o.cliente_idCliente = c.idCliente
+                  JOIN persona pe ON pe.idPersona = c.persona_idPersona
+                  JOIN usuario u ON pe.usuario_idUsuario = u.idUsuario
+                  WHERE e.estadoEnvio = 'Entregado' AND e.repartidor_idUsuario = ?
+                  LIMIT ? OFFSET ?";
+    
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("iii", $idRepartidor, $limite, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $envios = $result->fetch_all(MYSQLI_ASSOC);
+    
+        $stmt->close();
+        $conn->close();
+    
+        return $envios;
+    }
+    
+    public function listarEnviosCancelados($idRepartidor, $limite, $offset) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "SELECT e.idEnvio, e.fechaEnvio, e.estadoEnvio, o.idOrden, u.nickname
+                  FROM envio e
+                  JOIN orden o ON e.orden_idOrden = o.idOrden
+                  JOIN cliente c ON o.cliente_idCliente = c.idCliente
+                  JOIN persona pe ON pe.idPersona = c.persona_idPersona
+                  JOIN usuario u ON pe.usuario_idUsuario = u.idUsuario
+                  WHERE e.estadoEnvio = 'Cancelado' AND e.repartidor_idUsuario = ?
+                  LIMIT ? OFFSET ?";
+    
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("iii", $idRepartidor, $limite, $offset);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $envios = $result->fetch_all(MYSQLI_ASSOC);
+    
+        $stmt->close();
+        $conn->close();
+    
+        return $envios;
     }
     
     
@@ -225,34 +277,6 @@ class Envio {
         return $idOrden;
     }
 
-    public function notificacionEstadoPedido($idCliente){
-        $conexion = new Conexion();
-        $conn = $conexion->conectar();
-        
-        $query = "SELECT o.idOrden, o.estado
-                  FROM orden o
-                  JOIN cliente c ON o.cliente_idCliente = c.idCliente
-                  JOIN persona p ON p.idPersona = c.persona_idPersona
-                  JOIN usuario u ON p.usuario_idUsuario = u.idUsuario
-                  WHERE u.idUsuario ='$idCliente'";
-        $resultado = $conn->query($query);
-        
-        $estadosPedidos = [];
-        
-        if ($resultado) {
-            while ($fila = $resultado->fetch_assoc()) {
-                $estadosPedidos[] = $fila;
-            }
-            $conexion->desconectar();
-            return $estadosPedidos;
-        } else {
-            error_log("Error: " . $conn->error);
-        }
-        
-        $conexion->desconectar();
-        return $estadosPedidos;
-    }
-
     public function contarEnviosPendientes(){
         $conexion = new Conexion();
         $conn = $conexion->conectar();
@@ -295,6 +319,27 @@ class Envio {
         return 0;
     }
     
+    public function cancelarEnvio($idEnvio) {
+        $conexion = new Conexion();
+        $conn = $conexion->conectar();
+    
+        $query = "UPDATE envio SET estadoEnvio = 'Cancelado' WHERE idEnvio = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $idEnvio);
+    
+        if ($stmt->execute()) {
+            $stmt->close();
+            $conexion->desconectar();
+            return true;
+        } else {
+            error_log("Error al cancelar envío: " . $stmt->error);
+        }
+    
+        $stmt->close();
+        $conexion->desconectar();
+        return false;
+    }    
+
     /**
      * Get the value of idEnvio
      */

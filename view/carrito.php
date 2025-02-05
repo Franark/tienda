@@ -49,4 +49,4 @@ $total = 0;
 
 <p>Total: $<?php echo number_format($total, 2, ',', '.'); ?></p>
 
-<a href="?page=procesoPago">Proceder al pago</a>
+<a href="?page=procesoPago" class="btn">Proceder al pago</a>

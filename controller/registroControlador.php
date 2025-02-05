@@ -44,5 +44,4 @@ if ($usuario->guardar()) {
 } else {
     header('Location: ../?page=signup&error=Error al registrar el usuario');
 }
-
 ?>

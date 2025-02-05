@@ -2,9 +2,7 @@
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 
-require '../PHPMailer/Exception.php';
-require '../PHPMailer/PHPMailer.php';
-require '../PHPMailer/SMTP.php';
+require '../vendor/autoload.php';
 
 function enviarCorreoCambioPassword($userEmail, $resetLink) {
     $mail = new PHPMailer(true);
@@ -15,8 +13,9 @@ function enviarCorreoCambioPassword($userEmail, $resetLink) {
         $mail->SMTPAuth   = true;
         $mail->Username   = 'oscarfranciscooscar1@gmail.com';
         $mail->Password   = 'fhkl gysh pkvf wahe'; 
-        $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
-        $mail->Port       = 465;
+        $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS; 
+        $mail->Port = 587; 
+
         
         $mail->setFrom('oscarfranciscooscar1@gmail.com', 'Mailer');
         $mail->addAddress($userEmail);

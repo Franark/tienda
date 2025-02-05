@@ -6,14 +6,34 @@ function loadPage($page) {
     require_once('model/rolPermiso.php');
     $rolPermiso = new RolPermiso();
 
-    $publicPages = ['signup', 'login', 'enviarMensaje', 'olvidoPassword', 'reestablecerContraseña', 'verificarStock'];
+    $publicPages = ['signup', 'login', 'enviarMensaje', 'olvidoPassword', 'reestablecerContraseña', 'verificarStock', 'catalogoProducto', 'verProduct'];
 
     if (isset($_SESSION['idUsuario'])) {
         if (in_array($page, $publicPages)) {
-            header('Location: ./?page=catalogoProductos');
+            if (isset($_SESSION['idRolUsuario'])) {
+                switch ($_SESSION['idRolUsuario']) {
+                    case 1: 
+                        header('Location: ./?page=gestionUsuarios');
+                        break;
+                    case 2: 
+                        header('Location: ./?page=catalogoProductos');
+                        break;
+                    case 3: 
+                        header('Location: ./?page=gestionProductos');
+                        break;
+                    case 4: 
+                        header('Location: ./?page=gestionEnvios');
+                        break;
+                    default:
+                        header('Location: ./?page=login&error=Rol desconocido');
+                        break;
+                }
+            } else {
+                header('Location: ./?page=login&error=No se ha detectado un rol');
+            }
             exit;
         }
-    }
+    }    
 
     $privatePages = isset($_SESSION['idRolUsuario']) ? $rolPermiso->listarRolPermisos($_SESSION['idRolUsuario']) : [];
 
@@ -31,7 +51,12 @@ function mostrarSidebarPorRol($idRolUsuario) {
         include('components/sidebarAdmin.php');
     } elseif ($idRolUsuario == 2) {
         include('components/sidebarCliente.php');
-    } else {
+    } elseif ($idRolUsuario == 3) {
+        include('components/sidebarEmpleado.php');
+    }elseif ($idRolUsuario == 4) {
+        include('components/sidebarRepartidor.php');
+    }
+    else {
         include('components/sidebarInvitado.php');
     }
 }
@@ -39,10 +64,8 @@ function mostrarSidebarPorRol($idRolUsuario) {
 function mostrarNotificaciones($idRolUsuario) {
     if ($idRolUsuario == 1) {
         include('components/notificacionAdmin.php');
-    } elseif ($idRolUsuario == 2) {
-        include('components/notificacionCliente.php');
-    } else {
-        include('components/notificacionInvitado.php');
+    } elseif ($idRolUsuario == 3) {
+        include('components/notificacionAdmin.php');
     }
 }
 ?>
@@ -103,7 +126,7 @@ function mostrarNotificaciones($idRolUsuario) {
 
 <div class="main-content">
     <?php
-    $page = isset($_GET['page']) ? $_GET['page'] : 'login';
+    $page = isset($_GET['page']) ? $_GET['page'] : 'catalogoProducto';
     loadPage($page);
     ?>
 </div>
@@ -127,17 +150,25 @@ function toggleNotifications() {
     notificationsList.style.display = notificationsList.style.display === 'none' ? 'block' : 'none';
 }
 
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     var notificationIcon = document.querySelector('.notifications-toggle');
     var notificationsList = document.getElementById('notifications-list');
-    var notificationDot = document.getElementById('notification-dot');
+    var notificationCount = document.querySelector('.notification-count');
 
-    notificationIcon.addEventListener('click', function() {
-        notificationsList.style.display = notificationsList.style.display === 'none' || notificationsList.style.display === '' ? 'block' : 'none';
-        
+    notificationIcon.addEventListener('click', function () {
+        notificationsList.style.display =
+            notificationsList.style.display === 'none' || notificationsList.style.display === ''
+                ? 'block'
+                : 'none';
+
         if (notificationsList.style.display === 'block') {
-            notificationDot.style.display = 'none';
-        }
+            notificationCount.classList.add('hidden');
+
+            fetch('controller/marcarNotificacionesLeidas.php', { method: 'POST' })
+                .then(response => response.text())
+                .then(data => console.log('Notificaciones marcadas como leídas: ', data))
+                .catch(error => console.error('Error:', error));
+            }
     });
 });
 </script>

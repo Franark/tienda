@@ -13,7 +13,7 @@ if (isset($_GET['id'])) {
 
 $usuario = new Usuario();
 if ($usuario->eliminar($idUsuario)) {
-    header('Location: ../?page=gestionUsuarios');
+    header('Location: ../?page=gestionUsuarios&mensaje=eliminado');
 } else {
     echo "Error al eliminar el usuario con ID $idUsuario";
     exit;

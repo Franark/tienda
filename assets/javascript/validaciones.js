@@ -23,20 +23,19 @@ document.getElementById("crearCategoriaForm").addEventListener("submit", functio
         return;
     }
 });
-function confirmarEliminacion(idCategoriaProducto) {
-    Swal.fire({
-        title: '¿Está seguro?',
-        text: 'Una vez eliminada, no podrá recuperar esta categoría.',
+function confirmarEliminacion(id) {
+    return Swal.fire({
+        title: '¿Estás seguro?',
+        text: "Esta acción no se puede deshacer",
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Eliminar',
+        confirmButtonText: 'Sí, eliminar',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = 'controller/categoriaControlador.php?accion=eliminar&idCategoriaProducto=' + idCategoriaProducto;
+            window.location.href = `controller/categoriaControlador.php?accion=eliminar&idCategoriaProducto=${id}`;
         }
+        return false;
     });
 }
 document.getElementById('editarCategoriaForm').addEventListener('submit', function(event) {

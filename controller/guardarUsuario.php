@@ -26,10 +26,15 @@ if ($usuario->guardar()) {
     if ($usuario->guardarTokenConfirmacion($token)) {
         $userEmail = $email;
         require 'enviarMensaje.php';
+        header('Location: ../?page=crearUsuario&success=Usuario creado con éxito! Correo de confirmación enviado.');
+        exit();
     } else {
         header('Location: ../?page=crearUsuario&error=Error al generar el token');
+        exit();
     }
 } else {
     header('Location: ../?page=crearUsuario&error=Error al registrar el usuario');
+    exit();
 }
+
 ?>

@@ -43,8 +43,8 @@
             <input type="date" id="fechaVencimiento" name="fechaVencimiento">
         </div>
         <div class="form-group">
-            <label for="imagen">Imagen:</label>
-            <input type="file" id="imagen" name="imagen" accept="image/*">
+            <label for="imagenes">Imágenes:</label>
+            <input type="file" id="imagenes" name="imagenes[]" accept="image/*" multiple>
         </div>
         <div class="form-group">
             <label for="marca_idMarca">Marca:</label>

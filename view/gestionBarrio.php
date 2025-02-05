@@ -38,7 +38,7 @@
             foreach ($barrios as $b) {
                 echo "<tr>";
                 echo "<td>{$b['idAtributoDomicilio']}</td>";
-                echo "<td>{$b['nombreAtributoDomicilio']}</td>";
+                echo "<td>{$b['nombreAtributo']}</td>";
                 echo "<td><a href='?page=editarAtributoDomicilio&idAtributoDomicilio={$b['idAtributoDomicilio']}'>Editar</a> | <a href='controller/barrioControlador.php?accion=eliminar&idAtributoDomicilio={$b['idAtributoDomicilio']}'>Eliminar</a></td>";
                 echo "</tr>";
             }
